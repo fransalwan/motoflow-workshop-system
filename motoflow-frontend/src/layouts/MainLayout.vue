@@ -17,48 +17,19 @@
         </router-view>
       </main>
 
-      <!-- Mobile Bottom Navigation Bar (Thumb-friendly for smartphone users) -->
+      <!-- Mobile Bottom Navigation Bar (Dynamic Role-Based) -->
       <nav class="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-md border-t border-slate-200 flex items-center justify-around px-2 z-40 shadow-lg">
         <router-link
-          to="/dashboard"
-          class="flex flex-col items-center justify-center w-14 py-1 text-[10px] font-semibold transition"
-          :class="$route.path === '/dashboard' ? 'text-red-600' : 'text-slate-400'">
-          <LayoutDashboard class="w-5 h-5 mb-0.5" />
-          <span>Omzet</span>
-        </router-link>
-
-        <router-link
-          to="/work-orders"
-          class="flex flex-col items-center justify-center w-14 py-1 text-[10px] font-semibold transition"
-          :class="$route.path.startsWith('/work-orders') && $route.path !== '/work-orders/create' ? 'text-red-600' : 'text-slate-400'">
-          <ClipboardList class="w-5 h-5 mb-0.5" />
-          <span>Servis</span>
-        </router-link>
-
-        <!-- Center Raised Action Button (Kasir Retail OTC Cepat) -->
-        <router-link
-          to="/pos-retail"
-          class="flex flex-col items-center justify-center -mt-5">
-          <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-red-700 to-red-500 text-white flex items-center justify-center shadow-lg shadow-red-900/30 border-4 border-white active:scale-90 transition">
-            <ShoppingBag class="w-5 h-5 stroke-[2.2]" />
+          v-for="item in visibleBottomItems"
+          :key="item.to"
+          :to="item.to"
+          class="flex flex-col items-center justify-center transition"
+          :class="item.isCenter ? '-mt-5' : 'w-14 py-1 text-[10px] font-semibold ' + ($route.path === item.to ? 'text-red-600' : 'text-slate-400')">
+          <div v-if="item.isCenter" class="w-12 h-12 rounded-full bg-gradient-to-tr from-red-700 to-red-500 text-white flex items-center justify-center shadow-lg shadow-red-900/30 border-4 border-white active:scale-90 transition">
+            <component :is="item.icon" class="w-5 h-5 stroke-[2.2]" />
           </div>
-          <span class="text-[9px] font-bold text-slate-700 mt-1">Retail POS</span>
-        </router-link>
-
-        <router-link
-          to="/showroom"
-          class="flex flex-col items-center justify-center w-14 py-1 text-[10px] font-semibold transition"
-          :class="$route.path === '/showroom' ? 'text-red-600' : 'text-slate-400'">
-          <Bike class="w-5 h-5 mb-0.5" />
-          <span>Showroom</span>
-        </router-link>
-
-        <router-link
-          to="/inventory"
-          class="flex flex-col items-center justify-center w-14 py-1 text-[10px] font-semibold transition"
-          :class="$route.path === '/inventory' ? 'text-red-600' : 'text-slate-400'">
-          <PackageCheck class="w-5 h-5 mb-0.5" />
-          <span>HGP</span>
+          <component v-else :is="item.icon" class="w-5 h-5 mb-0.5" />
+          <span :class="item.isCenter ? 'text-[9px] font-bold text-slate-700 mt-1' : ''">{{ item.label }}</span>
         </router-link>
       </nav>
     </div>
@@ -69,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import {
   LayoutDashboard,
   ClipboardList,
@@ -78,12 +49,41 @@ import {
   Users,
   ShoppingBag,
   Bike,
+  Wrench,
 } from 'lucide-vue-next'
 import Sidebar from '../components/Sidebar.vue'
 import Navbar from '../components/Navbar.vue'
 import ToastContainer from '../components/ToastContainer.vue'
+import { useAuthStore } from '../stores/auth'
+import type { Role } from '../types'
 
+const authStore = useAuthStore()
 const isMobileMenuOpen = ref(false)
+
+interface BottomItem {
+  label: string
+  to: string
+  icon: any
+  isCenter?: boolean
+  roles: Role[]
+}
+
+const allBottomItems: BottomItem[] = [
+  { label: 'Omzet', to: '/dashboard', icon: LayoutDashboard, roles: ['admin'] },
+  { label: 'Servis', to: '/work-orders', icon: ClipboardList, roles: ['admin', 'service_advisor', 'cashier', 'mechanic'] },
+  { label: 'Motor', to: '/customers', icon: Users, roles: ['service_advisor'] },
+  { label: 'Daftar', to: '/work-orders/create', icon: Plus, isCenter: true, roles: ['service_advisor'] },
+  { label: 'Retail', to: '/pos-retail', icon: ShoppingBag, isCenter: true, roles: ['admin', 'cashier'] },
+  { label: 'Showroom', to: '/showroom', icon: Bike, roles: ['admin', 'service_advisor', 'cashier'] },
+  { label: 'Pit Servis', to: '/mechanics', icon: Wrench, roles: ['mechanic'] },
+  { label: 'HGP', to: '/inventory', icon: PackageCheck, roles: ['admin', 'cashier', 'service_advisor'] },
+]
+
+const visibleBottomItems = computed(() => {
+  const role = authStore.user?.role
+  if (!role) return []
+  return allBottomItems.filter(item => item.roles.includes(role))
+})
 </script>
 
 <style scoped>

@@ -24,7 +24,7 @@
           <p class="px-3 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Menu Bengkel</p>
 
           <router-link
-            v-for="item in menuItems"
+            v-for="item in visibleMenuItems"
             :key="item.to"
             :to="item.to"
             class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group"
@@ -91,7 +91,7 @@
           <!-- Navigation Links -->
           <div class="py-4 space-y-1">
             <router-link
-              v-for="item in menuItems"
+              v-for="item in visibleMenuItems"
               :key="item.to"
               :to="item.to"
               @click="$emit('close')"
@@ -151,6 +151,7 @@ import {
   Bike,
 } from 'lucide-vue-next'
 import { useAuthStore } from '../stores/auth'
+import type { Role } from '../types'
 
 defineProps<{
   isOpen?: boolean
@@ -161,16 +162,29 @@ defineEmits(['close'])
 const router = useRouter()
 const authStore = useAuthStore()
 
-const menuItems = [
-  { label: 'Executive Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'Work Orders Servis', to: '/work-orders', icon: ClipboardList },
-  { label: 'POS Retail Part & Oli', to: '/pos-retail', icon: ShoppingBag },
-  { label: 'Showroom Motor & NSC', to: '/showroom', icon: Bike },
-  { label: 'Pendaftaran Servis', to: '/work-orders/create', icon: PlusCircle },
-  { label: 'Suku Cadang HGP', to: '/inventory', icon: PackageCheck },
-  { label: 'Data Pelanggan & Motor', to: '/customers', icon: Users },
-  { label: 'Mekanik & Pit Servis', to: '/mechanics', icon: Wrench },
+interface NavItem {
+  label: string
+  to: string
+  icon: any
+  roles: Role[]
+}
+
+const allMenuItems: NavItem[] = [
+  { label: 'Executive Dashboard', to: '/dashboard', icon: LayoutDashboard, roles: ['admin'] },
+  { label: 'Work Orders Servis', to: '/work-orders', icon: ClipboardList, roles: ['admin', 'service_advisor', 'cashier', 'mechanic'] },
+  { label: 'POS Retail Part & Oli', to: '/pos-retail', icon: ShoppingBag, roles: ['admin', 'cashier', 'service_advisor'] },
+  { label: 'Showroom Motor & NSC', to: '/showroom', icon: Bike, roles: ['admin', 'service_advisor', 'cashier'] },
+  { label: 'Pendaftaran Servis', to: '/work-orders/create', icon: PlusCircle, roles: ['admin', 'service_advisor'] },
+  { label: 'Suku Cadang HGP', to: '/inventory', icon: PackageCheck, roles: ['admin', 'cashier', 'service_advisor'] },
+  { label: 'Data Pelanggan & Motor', to: '/customers', icon: Users, roles: ['admin', 'service_advisor'] },
+  { label: 'Mekanik & Pit Servis', to: '/mechanics', icon: Wrench, roles: ['admin', 'service_advisor', 'mechanic'] },
 ]
+
+const visibleMenuItems = computed(() => {
+  const role = authStore.user?.role
+  if (!role) return []
+  return allMenuItems.filter(item => item.roles.includes(role))
+})
 
 const userInitial = computed(() => {
   if (!authStore.user?.full_name) return 'U'

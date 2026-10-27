@@ -111,6 +111,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { User as UserIcon, Lock, AlertCircle } from 'lucide-vue-next'
 import { useAuthStore } from '../stores/auth'
+import { getDefaultRouteForRole } from '../router'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -127,7 +128,8 @@ function setCredentials(u: string, p: string) {
 async function handleLogin() {
   const success = await authStore.login(username.value, password.value)
   if (success) {
-    router.push('/dashboard')
+    const targetRoute = getDefaultRouteForRole(authStore.user?.role)
+    router.push(targetRoute)
   }
 }
 </script>

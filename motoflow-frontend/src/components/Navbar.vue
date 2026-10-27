@@ -32,8 +32,18 @@
         <span class="hidden md:inline">TV Ruang Tunggu</span>
       </router-link>
 
-      <!-- Quick Action: Buat Work Order Baru -->
+      <!-- Quick Action: Kasir Retail for Cashier -->
       <router-link
+        v-if="authStore.user?.role === 'cashier'"
+        to="/pos-retail"
+        class="inline-flex items-center space-x-1.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-xs transition active:scale-95">
+        <ShoppingBag class="w-4 h-4" />
+        <span>Kasir Retail</span>
+      </router-link>
+
+      <!-- Quick Action: Buat Work Order Baru for Admin / SA -->
+      <router-link
+        v-else-if="authStore.user?.role === 'admin' || authStore.user?.role === 'service_advisor'"
         to="/work-orders/create"
         class="inline-flex items-center space-x-1.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-xs transition active:scale-95">
         <Plus class="w-4 h-4" />
@@ -46,11 +56,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { Clock, Plus, Menu, Tv } from 'lucide-vue-next'
+import { Clock, Plus, Menu, Tv, ShoppingBag } from 'lucide-vue-next'
+import { useAuthStore } from '../stores/auth'
 
 defineEmits(['toggle-mobile-menu'])
 
 const route = useRoute()
+const authStore = useAuthStore()
 const currentTime = ref('')
 
 const pageTitle = computed(() => {
@@ -63,6 +75,10 @@ const pageTitle = computed(() => {
       return 'Pendaftaran Servis Baru'
     case 'WorkOrderDetail':
       return 'Kasir Billing & Detail Servis'
+    case 'PosRetail':
+      return 'Kasir POS Penjualan Suku Cadang & Oli'
+    case 'Showroom':
+      return 'Showroom Motor Honda & NSC Finance'
     case 'Inventory':
       return 'Inventaris Suku Cadang HGP'
     case 'Customers':

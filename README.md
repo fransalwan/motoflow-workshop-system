@@ -137,12 +137,29 @@ flowchart LR
 
 Tersedia tombol login demo otomatis pada halaman `/login`:
 
-| Peran (Role) | Username | Password | Tanggung Jawab Operasional |
-| :--- | :--- | :--- | :--- |
-| **Kepala Bengkel (Admin)** | `admin` | `password123` | Akses seluruh dashboard eksekutif, data master, dan laporan omzet |
-| **Service Advisor** | `advisor` | `password123` | Pendaftaran motor masuk, diagnosa keluhan, dan penerbitan SPK |
-| **Kasir POS AHASS** | `kasir` | `password123` | Penyelesaian billing, input pembayaran, cetak struk kasir thermal |
-| **Mekanik Senior** | `mekanik` | `password123` | Pelaksanaan pengerjaan servis di Pit 1 dan pengambilan suku cadang |
+| Peran (Role) | Username | Password | Tanggung Jawab Operasional | Halaman Utama (Default Home) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Kepala Bengkel (Admin)** | `admin` | `password123` | Akses penuh dashboard eksekutif, data master, dan laporan omzet | `/dashboard` |
+| **Service Advisor** | `advisor` | `password123` | Pendaftaran motor masuk, diagnosa keluhan, dan penerbitan SPK | `/work-orders` |
+| **Kasir POS AHASS** | `kasir` | `password123` | Penyelesaian billing servis, kasir retail OTC, cetak struk thermal | `/pos-retail` |
+| **Mekanik Senior** | `mekanik` | `password123` | Pelaksanaan pengerjaan servis di Pit dan pemantauan Kanban Board | `/work-orders` |
+
+### Matriks Akses Halaman Berdasarkan Peran (Role-Based Access Control / RBAC)
+
+| Halaman / Fitur Bengkel | Rute URL | Admin (Kepala Bengkel) | Service Advisor | Kasir POS | Mekanik Pit |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **Executive Dashboard** | `/dashboard` | ✅ | ❌ | ❌ | ❌ |
+| **Work Orders & Kanban Pit** | `/work-orders` | ✅ | ✅ (Home) | ✅ | ✅ (Home) |
+| **Detail WO & Kasir Billing** | `/work-orders/:id` | ✅ | ✅ | ✅ | ✅ |
+| **Pendaftaran Servis Baru** | `/work-orders/create` | ✅ | ✅ | ❌ | ❌ |
+| **Kasir POS Retail OTC** | `/pos-retail` | ✅ | ✅ | ✅ (Home) | ❌ |
+| **Showroom & NSC Finance** | `/showroom` | ✅ | ✅ | ✅ | ❌ |
+| **Katalog Suku Cadang HGP** | `/inventory` | ✅ | ✅ | ✅ | ❌ |
+| **Data Pelanggan & Motor** | `/customers` | ✅ | ✅ | ❌ | ❌ |
+| **Mekanik & Pit Servis** | `/mechanics` | ✅ | ✅ | ❌ | ✅ |
+| **TV Display Ruang Tunggu** | `/waiting-display` | ✅ | ✅ | ✅ | ✅ |
+
+> **Catatan Keamanan & Tampilan Adaptif**: Navigasi menu (*Sidebar desktop, drawer mobile, dan bottom navigation bar*) **hanya menampilkan menu yang relevan bagi peran tersebut**. Jika pengguna mencoba mengetikkan URL terlarang secara manual di peramban, *Navigation Guard* Vue Router akan memblokir akses, memunculkan notifikasi peringatan (*Akses Terbatas*), dan mengarahkan pengguna kembali ke halaman utama mereka secara otomatis.
 
 ---
 
