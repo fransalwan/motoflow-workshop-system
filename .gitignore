@@ -52,3 +52,10 @@ Desktop.ini
 *.swp
 *.swo
 *~
+
+# Private interview cheat-sheets & temporary capture artifacts
+docs/CONTEKAN_*.pdf
+CONTEKAN_*.pdf
+screenshot_*.png
+test_*.png
+test.png
