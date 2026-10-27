@@ -1,0 +1,30 @@
+# Binaries & SQLite
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.db
+*.db-journal
+motoflow-backend/motoflow.db
+motoflow-backend/motoflow.db-journal
+
+# Node
+node_modules/
+dist/
+.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript Build Info & Generated Config Artifacts
+*.tsbuildinfo
+motoflow-frontend/vite.config.d.ts
+motoflow-frontend/vite.config.js
+
+# Environment & IDE
+.env
+.DS_Store
+.idea/
+.vscode/
+*.swp

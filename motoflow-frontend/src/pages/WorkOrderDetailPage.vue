@@ -1,0 +1,368 @@
+<template>
+  <div class="max-w-6xl mx-auto space-y-8">
+    <div v-if="workOrderStore.loading && !wo">
+      <SkeletonLoader />
+    </div>
+
+    <div v-else-if="wo" class="space-y-8">
+      <!-- Top Bar: WO Number, Status & Action Print Buttons -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-3">
+            <h1 class="text-2xl font-black text-slate-900 font-mono tracking-tight">{{ wo.wo_number }}</h1>
+            <span 
+              :class="[getStatusBadge(wo.status).bgClass, getStatusBadge(wo.status).textClass, getStatusBadge(wo.status).borderClass]"
+              class="px-3 py-1 rounded-lg text-xs font-bold border uppercase tracking-wider">
+              {{ getStatusBadge(wo.status).label }}
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Diterbitkan pada {{ formatDate(wo.created_at) }}</p>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <!-- Thermal Receipt Button -->
+          <button
+            @click="showThermalModal = true"
+            class="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-3.5 py-2 rounded-xl transition border border-slate-300">
+            <Printer class="w-4 h-4 text-slate-600" />
+            <span>Struk POS Thermal</span>
+          </button>
+
+          <!-- A4 Invoice Button -->
+          <button
+            @click="showA4Modal = true"
+            class="inline-flex items-center space-x-1.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow transition">
+            <FileText class="w-4 h-4" />
+            <span>Faktur Resmi A4</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Service Workflow Stepper -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Progres Servis Motor Honda</h4>
+        <div class="grid grid-cols-4 gap-2 text-center text-xs">
+          <!-- Step 1: Draft -->
+          <div :class="isStepActive('draft') ? 'border-red-600 bg-red-50 text-red-900 font-bold' : 'border-slate-200 text-slate-400'"
+               class="p-3 rounded-xl border transition">
+            <span class="block text-[10px] uppercase tracking-wider">Tahap 1</span>
+            <span>Pendaftaran SA</span>
+          </div>
+
+          <!-- Step 2: In Progress -->
+          <div :class="isStepActive('in_progress') ? 'border-blue-600 bg-blue-50 text-blue-900 font-bold' : 'border-slate-200 text-slate-400'"
+               class="p-3 rounded-xl border transition">
+            <span class="block text-[10px] uppercase tracking-wider">Tahap 2</span>
+            <span>Pengerjaan Pit</span>
+          </div>
+
+          <!-- Step 3: Completed -->
+          <div :class="isStepActive('completed') ? 'border-purple-600 bg-purple-50 text-purple-900 font-bold' : 'border-slate-200 text-slate-400'"
+               class="p-3 rounded-xl border transition">
+            <span class="block text-[10px] uppercase tracking-wider">Tahap 3</span>
+            <span>Inspeksi Akhir</span>
+          </div>
+
+          <!-- Step 4: Paid -->
+          <div :class="isStepActive('paid') ? 'border-emerald-600 bg-emerald-50 text-emerald-900 font-bold' : 'border-slate-200 text-slate-400'"
+               class="p-3 rounded-xl border transition">
+            <span class="block text-[10px] uppercase tracking-wider">Tahap 4</span>
+            <span>Kasir & Lunas</span>
+          </div>
+        </div>
+
+        <!-- Workflow Action Buttons -->
+        <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-xs text-slate-500">Tindakan Alur Status:</span>
+          <div class="flex items-center space-x-2">
+            <button
+              v-if="wo.status === 'draft'"
+              @click="handleStatusChange('in_progress')"
+              class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition">
+              Mulai Kerjakan di Pit Servis &rarr;
+            </button>
+            <button
+              v-if="wo.status === 'in_progress'"
+              @click="handleStatusChange('completed')"
+              class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition">
+              Selesaikan Servis & Inspeksi &rarr;
+            </button>
+            <span v-if="wo.status === 'paid'" class="text-emerald-700 font-bold text-xs bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+              Transaksi Selesai & Lunas
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2-Columns: Left Items, Right Customer & POS Cashier Terminal -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left: Items & Parts Table (2 Cols) -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Rincian Suku Cadang HGP & Jasa Mekanik</h3>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px]">
+                    <th class="py-2.5">Deskripsi</th>
+                    <th class="py-2.5 text-center">Qty</th>
+                    <th class="py-2.5 text-right">Harga</th>
+                    <th class="py-2.5 text-center">Disc</th>
+                    <th class="py-2.5 text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr v-for="item in wo.items" :key="item.id" class="hover:bg-slate-50/50">
+                    <td class="py-3">
+                      <span v-if="item.item_type === 'service'" class="text-blue-600 font-bold mr-1">[JASA]</span>
+                      <span class="font-semibold text-slate-800">{{ item.item_name_snapshot }}</span>
+                      <p class="text-[10px] text-slate-400 font-mono">{{ item.part_number_snapshot }}</p>
+                    </td>
+                    <td class="py-3 text-center font-mono font-bold text-slate-700">{{ item.quantity }}</td>
+                    <td class="py-3 text-right font-mono text-slate-600">{{ formatRupiah(item.price_snapshot) }}</td>
+                    <td class="py-3 text-center font-mono text-slate-500">{{ Number(item.discount_percent) > 0 ? `${item.discount_percent}%` : '-' }}</td>
+                    <td class="py-3 text-right font-mono font-bold text-slate-900">{{ formatRupiah(item.subtotal) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Totals Breakdown -->
+            <div class="border-t border-slate-200 pt-4 space-y-2 text-xs">
+              <div class="flex justify-between text-slate-600">
+                <span>Subtotal Suku Cadang:</span>
+                <span class="font-mono font-medium">{{ formatRupiah(wo.parts_subtotal) }}</span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>Subtotal Jasa Servis:</span>
+                <span class="font-mono font-medium">{{ formatRupiah(wo.services_subtotal) }}</span>
+              </div>
+              <div v-if="Number(wo.total_discount) > 0" class="flex justify-between text-emerald-600 font-medium">
+                <span>Total Diskon Promosi:</span>
+                <span class="font-mono">-{{ formatRupiah(wo.total_discount) }}</span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>PPN ({{ wo.tax_rate }}%):</span>
+                <span class="font-mono font-medium">{{ formatRupiah(wo.tax_amount) }}</span>
+              </div>
+              <div class="flex justify-between text-base font-black text-slate-900 pt-2 border-t border-slate-300">
+                <span class="text-red-600">TOTAL BIAYA:</span>
+                <span class="font-mono">{{ formatRupiah(wo.grand_total) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Customer Info & POS Cashier Terminal (1 Col) -->
+        <div class="space-y-6">
+          <!-- Customer & Bike Card -->
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-3 text-xs">
+            <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px] border-b border-slate-100 pb-2">
+              Data Konsumen & Unit
+            </h4>
+            <div class="space-y-1.5">
+              <p><span class="text-slate-500">Pemilik:</span> <span class="font-bold text-slate-800">{{ wo.customer?.name }}</span></p>
+              <p><span class="text-slate-500">No. HP:</span> {{ wo.customer?.phone }}</p>
+              <p class="flex items-center space-x-1.5 pt-1">
+                <span class="font-mono font-black text-xs bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-300">
+                  {{ wo.customer?.plate_number }}
+                </span>
+                <span class="font-semibold text-slate-900">{{ wo.customer?.motor_model }}</span>
+              </p>
+              <p><span class="text-slate-500">Odometer:</span> <span class="font-mono font-semibold">{{ wo.entry_km }} KM</span></p>
+              <p><span class="text-slate-500">Mekanik:</span> <span class="font-semibold">{{ wo.mechanic?.name }} (Pit {{ wo.mechanic?.pit_number }})</span></p>
+            </div>
+          </div>
+
+          <!-- POS Cashier Terminal -->
+          <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+              <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+                Terminal Kasir POS
+              </h4>
+              <span 
+                :class="wo.payment_status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'"
+                class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                {{ wo.payment_status === 'paid' ? 'LUNAS' : 'BELUM BAYAR' }}
+              </span>
+            </div>
+
+            <!-- When Already Paid -->
+            <div v-if="wo.payment_status === 'paid'" class="space-y-3 bg-emerald-50/50 p-4 rounded-xl border border-emerald-200/60 text-xs">
+              <div class="flex justify-between text-slate-600">
+                <span>Metode Bayar:</span>
+                <span class="font-mono font-bold uppercase text-slate-800">{{ wo.payment_method }}</span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>Uang Diterima:</span>
+                <span class="font-mono font-bold text-slate-800">{{ formatRupiah(wo.paid_amount) }}</span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>Kembalian:</span>
+                <span class="font-mono font-bold text-emerald-700">{{ formatRupiah(wo.change_amount) }}</span>
+              </div>
+              <div class="text-[10px] text-slate-400 pt-2 border-t border-emerald-200">
+                Lunas pada {{ formatDate(wo.paid_at) }}
+              </div>
+            </div>
+
+            <!-- Cashier Payment Form (When Unpaid) -->
+            <form v-else @submit.prevent="handleProcessPayment" class="space-y-4 text-xs">
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1.5">Pilih Metode Pembayaran</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    v-for="method in ['cash', 'qris', 'transfer', 'debit'] as const"
+                    :key="method"
+                    @click="paymentMethod = method"
+                    :class="paymentMethod === method ? 'bg-red-600 text-white font-bold' : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'"
+                    class="py-2 px-2.5 rounded-lg text-center uppercase text-[11px] transition">
+                    {{ method }}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block font-semibold text-slate-700 mb-1.5">Jumlah Bayar Tunai / Transfer</label>
+                <input
+                  v-model.number="paidAmount"
+                  type="number"
+                  min="0"
+                  required
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 font-mono text-sm font-bold text-slate-900 focus:outline-none focus:border-red-500" />
+              </div>
+
+              <!-- Quick Denomination Buttons -->
+              <div class="flex items-center space-x-1.5">
+                <button
+                  type="button"
+                  @click="paidAmount = Number(wo?.grand_total)"
+                  class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-1 rounded text-[10px]">
+                  Uang Pas
+                </button>
+                <button
+                  type="button"
+                  @click="paidAmount = 100000"
+                  class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-1 rounded text-[10px]">
+                  100k
+                </button>
+                <button
+                  type="button"
+                  @click="paidAmount = 200000"
+                  class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-1 rounded text-[10px]">
+                  200k
+                </button>
+                <button
+                  type="button"
+                  @click="paidAmount = 500000"
+                  class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-1 rounded text-[10px]">
+                  500k
+                </button>
+              </div>
+
+              <!-- Live Kembalian Display -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                <div class="flex justify-between font-medium text-slate-500">
+                  <span>Kembalian:</span>
+                  <span class="font-mono font-bold" :class="liveChange >= 0 ? 'text-emerald-600' : 'text-red-500'">
+                    {{ liveChange >= 0 ? formatRupiah(liveChange) : `Kurang ${formatRupiah(Math.abs(liveChange))}` }}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                :disabled="workOrderStore.loading || liveChange < 0"
+                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md transition disabled:opacity-50">
+                <span v-if="!workOrderStore.loading">Selesaikan Pembayaran Kasir</span>
+                <span v-else>Memproses Transaksi...</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <ThermalReceiptModal 
+      :is-open="showThermalModal" 
+      :work-order="wo" 
+      @close="showThermalModal = false" />
+
+    <A4InvoiceModal 
+      :is-open="showA4Modal" 
+      :work-order="wo" 
+      @close="showA4Modal = false" />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { Printer, FileText } from 'lucide-vue-next'
+import { useWorkOrderStore } from '../stores/workOrder'
+import { formatRupiah, formatDate, getStatusBadge } from '../utils/format'
+import ThermalReceiptModal from '../components/ThermalReceiptModal.vue'
+import A4InvoiceModal from '../components/A4InvoiceModal.vue'
+import SkeletonLoader from '../components/SkeletonLoader.vue'
+import type { PaymentMethod, WorkOrderStatus } from '../types'
+
+const route = useRoute()
+const workOrderStore = useWorkOrderStore()
+
+const wo = computed(() => workOrderStore.currentWorkOrder)
+
+const showThermalModal = ref(false)
+const showA4Modal = ref(false)
+
+const paymentMethod = ref<PaymentMethod>('cash')
+const paidAmount = ref<number>(0)
+
+onMounted(async () => {
+  const id = Number(route.params.id)
+  const data = await workOrderStore.fetchWorkOrder(id)
+  if (data) {
+    paidAmount.value = Number(data.grand_total)
+  }
+})
+
+function isStepActive(step: string) {
+  if (!wo.value) return false
+  const order = ['draft', 'in_progress', 'completed', 'paid']
+  const currentIdx = order.indexOf(wo.value.status)
+  const targetIdx = order.indexOf(step)
+  return currentIdx >= targetIdx
+}
+
+const liveChange = computed(() => {
+  if (!wo.value) return 0
+  return paidAmount.value - Number(wo.value.grand_total)
+})
+
+async function handleStatusChange(status: WorkOrderStatus) {
+  if (!wo.value) return
+  try {
+    await workOrderStore.updateStatus(wo.value.id, status)
+  } catch (err: any) {
+    alert(err.message || 'Gagal mengubah status')
+  }
+}
+
+async function handleProcessPayment() {
+  if (!wo.value) return
+  if (liveChange.value < 0) {
+    alert('Jumlah uang pembayaran tidak mencukupi')
+    return
+  }
+
+  try {
+    await workOrderStore.processPayment(wo.value.id, paymentMethod.value, paidAmount.value)
+    showThermalModal.value = true // Automatically show receipt on payment completion!
+  } catch (err: any) {
+    alert(err.message || 'Gagal memproses pembayaran')
+  }
+}
+</script>
+
