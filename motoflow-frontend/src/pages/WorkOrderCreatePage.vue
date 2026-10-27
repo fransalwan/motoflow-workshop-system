@@ -226,6 +226,8 @@ import {
 import { useCustomerStore } from '../stores/customer'
 import { useSparepartStore } from '../stores/sparepart'
 import { useWorkOrderStore } from '../stores/workOrder'
+import { useToastStore } from '../stores/toast'
+import { playScannerBeep, playSuccessChime, playClickSound } from '../utils/sound'
 import api from '../services/api'
 import { formatRupiah } from '../utils/format'
 import type { Mechanic } from '../types'
@@ -234,6 +236,7 @@ const router = useRouter()
 const customerStore = useCustomerStore()
 const sparepartStore = useSparepartStore()
 const workOrderStore = useWorkOrderStore()
+const toastStore = useToastStore()
 
 const mechanics = ref<Mechanic[]>([])
 const selectedCustomerId = ref<number | null>(null)
@@ -285,6 +288,7 @@ function onCustomerChange() {
 }
 
 function addItemRow() {
+  playClickSound()
   selectedItems.value.push({
     sparepart_id: null,
     item_type: 'part',
@@ -298,6 +302,7 @@ function addItemRow() {
 }
 
 function removeItemRow(index: number) {
+  playClickSound()
   if (selectedItems.value.length > 1) {
     selectedItems.value.splice(index, 1)
   }
@@ -306,6 +311,7 @@ function removeItemRow(index: number) {
 function onSparepartSelect(row: RowItem) {
   const part = sparepartStore.spareparts.find((p) => p.id === row.sparepart_id)
   if (part) {
+    playScannerBeep()
     row.part_number = part.part_number
     row.item_name = part.name
     row.item_type = part.type
@@ -336,14 +342,14 @@ const calculatedGrandTotal = computed(() => {
 
 async function handleSubmit() {
   if (!selectedCustomerId.value) {
-    alert('Silakan pilih pelanggan terlebih dahulu')
+    toastStore.error('Silakan pilih pelanggan dan kendaraan terlebih dahulu')
     return
   }
 
   // Validate items
   for (const item of selectedItems.value) {
     if (!item.sparepart_id) {
-      alert('Terdapat baris suku cadang/jasa yang belum dipilih')
+      toastStore.warning('Terdapat baris suku cadang/jasa yang belum dipilih')
       return
     }
   }
@@ -368,9 +374,11 @@ async function handleSubmit() {
 
   try {
     const created = await workOrderStore.createWorkOrder(payload)
+    playSuccessChime()
+    toastStore.success(`Work Order ${created.wo_number} berhasil diterbitkan!`)
     router.push(`/work-orders/${created.id}`)
   } catch (err: any) {
-    alert(err.message || 'Gagal membuat Work Order')
+    toastStore.error(err.message || 'Gagal membuat Work Order')
   }
 }
 </script>

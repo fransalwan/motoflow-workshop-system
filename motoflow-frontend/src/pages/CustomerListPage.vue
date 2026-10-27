@@ -29,7 +29,8 @@
 
     <!-- Customer Cards / Table -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-      <div class="overflow-x-auto">
+      <!-- Desktop Table -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-xs text-left border-collapse">
           <thead>
             <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
@@ -73,6 +74,28 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Mobile Responsive Cards (Screens < 768px) -->
+      <div class="md:hidden divide-y divide-slate-100">
+        <div v-for="c in customerStore.customers" :key="c.id" class="p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-mono font-black text-xs bg-slate-100 text-slate-900 px-2.5 py-0.5 rounded border border-slate-300">
+              {{ c.plate_number }}
+            </span>
+            <span class="font-mono font-bold text-xs text-slate-700">{{ c.current_km }} KM</span>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-sm text-slate-900">{{ c.name }}</h4>
+            <p class="text-xs text-slate-600 font-medium">{{ c.motor_model }} ({{ c.year || '2023' }})</p>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-500">
+            <span>{{ c.phone }}</span>
+            <span class="truncate max-w-[150px]">{{ c.address || '-' }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -138,8 +161,11 @@
 import { ref, onMounted } from 'vue'
 import { Search, Plus } from 'lucide-vue-next'
 import { useCustomerStore } from '../stores/customer'
+import { useToastStore } from '../stores/toast'
+import { playSuccessChime } from '../utils/sound'
 
 const customerStore = useCustomerStore()
+const toast = useToastStore()
 const searchQuery = ref('')
 const showAddModal = ref(false)
 
@@ -167,7 +193,10 @@ function onSearch() {
 
 async function handleAddCustomer() {
   try {
+    const plate = form.value.plate_number.toUpperCase()
     await customerStore.createCustomer(form.value)
+    playSuccessChime()
+    toast.success(`Pelanggan & motor ${plate} berhasil didaftarkan!`)
     showAddModal.value = false
     form.value = {
       name: '',
@@ -179,7 +208,7 @@ async function handleAddCustomer() {
       address: '',
     }
   } catch (err: any) {
-    alert(err.message || 'Gagal menambahkan pelanggan')
+    toast.error(err.message || 'Gagal menambahkan pelanggan')
   }
 }
 </script>

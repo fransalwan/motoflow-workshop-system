@@ -9,6 +9,12 @@ const routes = [
     meta: { public: true },
   },
   {
+    path: '/waiting-display',
+    name: 'WaitingDisplay',
+    component: () => import('../pages/WaitingDisplayPage.vue'),
+    meta: { public: true },
+  },
+  {
     path: '/',
     component: () => import('../layouts/MainLayout.vue'),
     redirect: '/dashboard',

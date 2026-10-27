@@ -246,7 +246,44 @@ Sebagai bukti kesiapan ke tingkat *production-ready enterprise*, sistem telah di
 
 ---
 
-## 11. Profil Pengembang & Lisensi
+## 11. Mobile-First Responsive Experience & Inovasi UI/UX Bengkel AHASS
+
+Untuk menghadirkan pengalaman pengguna kelas industri yang siap diimplementasikan langsung di lantai bengkel (*workshop floor*) maupun ruang tunggu pelanggan resmi AHASS, sistem ini dilengkapi serangkaian inovasi antarmuka:
+
+### A. Arsitektur Mobile-First & Bottom Navigation Bar
+- **Thumb-Friendly Bottom Navigation**: Navigasi bawah khusus perangkat smartphone/tablet untuk mekanik dan service advisor yang bergerak aktif di lantai pit servis (*Omzet, Servis, (+) Daftar WO Baru, Suku Cadang, Motor*).
+- **Responsive Card View**: Tampilan tabel otomatis bertransformasi menjadi kartu informatif berdensitas tinggi pada layar sentuh kecil (`< 768px`) dengan ukuran target sentuh ramah jempol (*minimum touch target 44px*).
+- **Mobile Drawer Sidebar**: Navigasi hamburger cerdas dengan *backdrop blur* yang otomatis tertutup begitu menu dipilih.
+
+### B. Workshop Kanban Pit Board View
+- **Dual-View Switcher**: Kasir dan kepala bengkel dapat beralih antara **Tampilan Tabel Tradisional** dan **Kanban Board Interaktif** (Kolom: `Draft` &rarr; `In Progress` &rarr; `Completed` &rarr; `Paid`).
+- **1-Click Quick Status Advance**: Mempercepat alur pengerjaan teknisi di pit tanpa perlu membuka form edit (*"Mulai Servis"*, *"Selesai Servis"*, *"Buka Kasir"*).
+
+### C. Kasir POS Keyboard Shortcuts (Hotkeys)
+Mendukung alur transaksi kasir super cepat di jam sibuk tanpa perlu menyentuh mouse:
+- <kbd>F4</kbd>: Rotasi instan metode pembayaran (*TUNAI* &rarr; *QRIS* &rarr; *KARTU DEBIT* &rarr; *TRANSFER*).
+- <kbd>F8</kbd>: Isi otomatis uang pas (*Exact Cash Amount*).
+- <kbd>F9</kbd>: Tampilkan pratinjau struk thermal 58mm/80mm siap cetak.
+- <kbd>ESC</kbd>: Menutup jendela modal aktif secara instan.
+
+### D. Dynamic QRIS Modal & Web Audio Synthesizer
+- **QRIS Dinamis**: Modal QRIS otomatis dengan *countdown timer* 15 menit dan simulasi verifikasi transfer QRIS 1-klik.
+- **Native Web Audio API Synthesizer**: Efek suara sintetis tanpa aset berkas eksternal mp3:
+  - *Barcode Scanner Beep* (880Hz Sine Wave) saat memilih suku cadang HGP.
+  - *Success Chime* (Arpeggio nada ganda 523Hz & 659Hz) saat transaksi kasir berhasil diselesaikan.
+  - *Click Feedback* (1200Hz) untuk umpan balik respons tombol sentuh.
+
+### E. Pinia Toast Notification System
+Sistem notifikasi modern *non-blocking* menggantikan fungsi `alert()` bawaan browser, dilengkapi transisi halus, pewarnaan kontekstual (*Success, Error, Info*), dan *auto-dismiss* 4 detik.
+
+### F. Customer Waiting Lounge TV Monitor (`/waiting-display`)
+- **Fullscreen Kiosk Mode 16:9**: Tampilan layar lebar khusus TV monitor ruang tunggu pelanggan AHASS.
+- **Live Status Polling**: Pembaruan status otomatis setiap 5 detik memantau antrean motor di Pit 1 s/d Pit 4.
+- **Marquee Running Ticker**: Teks berjalan di bagian bawah mengedukasi pelanggan mengenai keaslian oli Honda AHM Oil, garansi servis 500 KM, dan tips keselamatan berkendara *#Cari_Aman*.
+
+---
+
+## 12. Profil Pengembang & Lisensi
 - **Pengembang**: **Frans Alwan** ([@fransalwan](https://github.com/fransalwan))
 - **Email**: fransalwan55@gmail.com
 - **Posisi Tujuan**: **Programmer Junior** — PT Nusantara Sakti Group (NSS)

@@ -36,7 +36,8 @@
 
     <!-- Inventory Table -->
     <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-      <div class="overflow-x-auto">
+      <!-- Desktop Table -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-xs text-left border-collapse">
           <thead>
             <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
@@ -96,6 +97,37 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Mobile Responsive Cards (Screens < 768px) -->
+      <div class="md:hidden divide-y divide-slate-100">
+        <div v-for="item in filteredItems" :key="item.id" class="p-4 space-y-2.5">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="font-mono text-xs text-slate-500 block">{{ item.part_number }}</span>
+              <span v-if="item.type === 'service'" class="text-blue-600 font-bold text-xs mr-1">[JASA]</span>
+              <span class="font-bold text-slate-900 text-sm">{{ item.name }}</span>
+            </div>
+            <span 
+              v-if="item.type === 'part' && item.stock <= item.min_stock"
+              class="bg-red-100 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded border border-red-200">
+              Stok Menipis
+            </span>
+          </div>
+
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-500">Stok: <strong>{{ item.type === 'service' ? 'Tersedia' : `${item.stock} ${item.unit}` }}</strong></span>
+            <span class="font-mono font-black text-sm text-slate-900">{{ formatRupiah(item.selling_price) }}</span>
+          </div>
+
+          <div v-if="item.type === 'part'" class="pt-2 border-t border-slate-100 flex justify-end">
+            <button
+              @click="openAdjustStock(item)"
+              class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3 py-1.5 rounded-lg transition">
+              Sesuaikan Stok
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Modal Adjust Stock -->
@@ -146,10 +178,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { Search, Plus, AlertCircle } from 'lucide-vue-next'
 import { useSparepartStore } from '../stores/sparepart'
+import { useToastStore } from '../stores/toast'
+import { playClickSound, playSuccessChime } from '../utils/sound'
 import { formatRupiah } from '../utils/format'
 import type { Sparepart } from '../types'
 
 const sparepartStore = useSparepartStore()
+const toastStore = useToastStore()
 const searchQuery = ref('')
 const selectedTab = ref('all')
 
@@ -193,6 +228,7 @@ const filteredItems = computed(() => {
 })
 
 function openAdjustStock(item: Sparepart) {
+  playClickSound()
   selectedPart.value = item
   adjustQty.value = 5
   showAdjustModal.value = true
@@ -200,12 +236,15 @@ function openAdjustStock(item: Sparepart) {
 
 async function handleSaveStock() {
   if (!selectedPart.value) return
+  playClickSound()
   try {
     await sparepartStore.updateStock(selectedPart.value.id, adjustQty.value, adjustReason.value)
+    playSuccessChime()
+    toastStore.success(`Stok suku cadang ${selectedPart.value.name} berhasil diperbarui!`)
     showAdjustModal.value = false
     sparepartStore.fetchSpareparts()
   } catch (err: any) {
-    alert(err.message || 'Gagal mengubah stok')
+    toastStore.error(err.message || 'Gagal mengubah stok')
   }
 }
 </script>
