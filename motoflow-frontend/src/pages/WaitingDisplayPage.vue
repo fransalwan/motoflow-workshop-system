@@ -299,3 +299,4 @@ function getProgressBarClass(status: WorkOrderStatus): string {
   animation: marquee 30s linear infinite;
 }
 </style>
+

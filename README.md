@@ -8,10 +8,25 @@
 [![Docker](https://img.shields.io/badge/Docker-Multi--Stage-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com)
 [![CI/CD](https://img.shields.io/badge/GitHub_Actions-Automated_CI-2088FF?style=for-the-badge&logo=github-actions)](.github/workflows/ci.yml)
 [![Live Demo Tunnel](https://img.shields.io/badge/Live_Tunnel-Cloudflare-F38020?style=for-the-badge&logo=cloudflare)](https://online-thousands-tutorial-king.trycloudflare.com)
+[![Mobile Ready](https://img.shields.io/badge/Mobile-First%20Responsive-brightgreen?style=for-the-badge)](https://online-thousands-tutorial-king.trycloudflare.com)
 
 > **Portofolio Aplikasi Web Khusus Posisi "Programmer Junior" di PT Nusantara Sakti Group (NSS)**  
 > *Dealer Resmi Honda, Bengkel AHASS, dan Perusahaan Multifinance Terbesar di Indonesia.*  
-> 🌐 **Live Public Demo**: [https://online-thousands-tutorial-king.trycloudflare.com](https://online-thousands-tutorial-king.trycloudflare.com)
+> 🌐 **Live Public Demo**: [https://online-thousands-tutorial-king.trycloudflare.com](https://online-thousands-tutorial-king.trycloudflare.com)  
+> 📺 **Live TV Kiosk Display**: [https://online-thousands-tutorial-king.trycloudflare.com/waiting-display](https://online-thousands-tutorial-king.trycloudflare.com/waiting-display)
+
+---
+
+## Quick Navigation / Panduan Demo Penguji (HRD & User Teknis NSS)
+
+| Modul Fitur | URL / Rute Demo | Fitur Utama yang Dapat Diuji |
+| :--- | :--- | :--- |
+| 🔐 **Portal Login Demo** | [`/login`](https://online-thousands-tutorial-king.trycloudflare.com/login) | Tombol 1-klik untuk berganti role: `Admin`, `Advisor`, `Kasir`, `Mekanik` |
+| 📊 **Executive Dashboard** | [`/dashboard`](https://online-thousands-tutorial-king.trycloudflare.com/dashboard) | Omset Harian/MTD, Top 5 Part HGP, Efisiensi Mekanik, Alert Stok Menipis |
+| 📋 **Work Order & POS Cashier** | [`/work-orders`](https://online-thousands-tutorial-king.trycloudflare.com/work-orders) | Switcher **Tabel vs Kanban Pit Board**, Hotkeys POS (`F4`, `F8`, `F9`), QRIS Dinamis |
+| 📺 **TV Waiting Lounge Monitor** | [`/waiting-display`](https://online-thousands-tutorial-king.trycloudflare.com/waiting-display) | Tampilan TV Kiosk 16:9 fullscreen, auto-polling 5s status Pit 1-4 & Marquee |
+| 📦 **Katalog Honda Genuine Parts** | [`/inventory`](https://online-thousands-tutorial-king.trycloudflare.com/inventory) | Penyesuaian stok HGP, filter oli MPX/SPX, kampas rem, busi, dan v-belt |
+| 👥 **Direktori Pelanggan & Motor** | [`/customers`](https://online-thousands-tutorial-king.trycloudflare.com/customers) | Master no. plat polisi, model motor Honda (Beat, Vario, PCX), riwayat KM |
 
 ---
 
@@ -141,6 +156,44 @@ Tersedia tombol login demo otomatis pada halaman `/login`:
 - **Pencegahan Floating-Point Drift**: Nilai moneter dikalkulasi menggunakan `shopspring/decimal` tanpa galat pembulatan IEEE-754.
 - **Cetak Struk POS Thermal (58mm / 80mm)**: Format struk ESC/POS lengkap dengan header bengkel resmi AHASS Nusantara Sakti, data no. polisi plat motor, rincian part/jasa, PPN 11%, dan syarat garansi servis 500 KM.
 - **Faktur Resmi Servis A4 (GoFPDF)**: Berkas PDF resmi berstandar A4 yang dihasilkan langsung dari backend Go, memuat rincian pekerjaan, tanda tangan ganda (*Pelanggan* & *Service Advisor*), serta stempel verifikasi digital AHASS.
+
+```text
+========================================
+       AHASS NUSANTARA SAKTI MOTOR
+     Jl. Raya Ciledug No. 88, Tangerang
+       Telp: (021) 7345-6789 / 0812-3456
+========================================
+No. WO   : WO-AHASS-20261027-0001
+Tgl/Jam  : 27/10/2026 14:30 WIB
+Kasir    : kasir (Siti Rahma)
+Mekanik  : Agus Setiawan (Pit 1)
+----------------------------------------
+Pelanggan: Budi Santoso
+No. Plat : B 3456 KRF
+Motor    : Honda Vario 160 ABS (12.500 KM)
+----------------------------------------
+RINCIAN SUKU CADANG / JASA    QTY  SUBTOTAL
+----------------------------------------
+AHM Oil MPX2 0.8L (Matik)      1  Rp 56.000
+Busi NGK CPR9EA-9              1  Rp 25.000
+Paket Servis Lengkap Matik     1  Rp 90.000
+----------------------------------------
+Subtotal Part & Jasa           : Rp 171.000
+Diskon                         :       Rp 0
+PPN 11%                        :  Rp 18.810
+========================================
+TOTAL TAGIHAN                  : Rp 189.810
+Metode Bayar                   :      TUNAI
+Diterima                       : Rp 200.000
+Kembalian                      :  Rp 10.190
+========================================
+  * GARANSI SERVIS RESMI AHASS 500 KM *
+  Gunakan selalu Honda Genuine Parts &
+     Oli Standar Pabrikan AHM Oil!
+ Terima kasih atas kepercayaan Anda di
+       PT NUSANTARA SAKTI GROUP
+========================================
+```
 
 ---
 
