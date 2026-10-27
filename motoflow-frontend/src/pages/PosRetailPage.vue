@@ -523,6 +523,7 @@ import { useSparepartStore } from '../stores/sparepart'
 import { useToastStore } from '../stores/toast'
 import { formatRupiah, formatDate } from '../utils/format'
 import { playScannerBeep, playSuccessChime, playClickSound } from '../utils/sound'
+import { printThermalReceipt } from '../utils/printer'
 import QRISModal from '../components/QRISModal.vue'
 import type { Sparepart } from '../types'
 
@@ -662,6 +663,10 @@ async function openReceiptForSale(saleId: number) {
 }
 
 function printReceipt() {
-  window.print()
+  printThermalReceipt(receiptText.value, {
+    widthMm: 58,
+    title: 'Struk Kasir Retail AHASS NSS',
+    barcodeText: 'HGP-RETAIL-OTC',
+  })
 }
 </script>

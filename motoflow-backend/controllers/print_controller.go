@@ -391,7 +391,11 @@ func (ctrl *PrintController) ServiceInvoicePDF(c *gin.Context) {
 	pdf.SetXY(25, sigY)
 	pdf.Cell(50, 4, "Tanda Tangan Pelanggan,")
 	pdf.SetXY(25, sigY+22)
-	pdf.Cell(50, 4, "( ............................................. )")
+	customerDisplayName := "............................................."
+	if wo.Customer != nil && wo.Customer.Name != "" {
+		customerDisplayName = wo.Customer.Name
+	}
+	pdf.Cell(50, 4, fmt.Sprintf("( %s )", customerDisplayName))
 
 	// Digital Seal
 	pdf.SetDrawColor(220, 38, 38)

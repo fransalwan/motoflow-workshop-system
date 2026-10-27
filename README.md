@@ -97,6 +97,8 @@ motoflow-workshop-system/
 │   └── vite.config.ts
 │
 ├── docs/                              # Technical Showcase untuk HRD / User Teknis NSS
+│   ├── api-documentation.md           # Panduan Lengkap RESTful API & Contoh JSON Payload
+│   ├── business-architecture.md       # Spesifikasi Domain, Formula Finansial & Leasing NSC
 │   ├── database-schema.sql            # Skema Relasi DDL, Foreign Key, & Index PostgreSQL
 │   ├── reporting-queries.sql          # Showcase Query SQL: JOIN, GROUP BY, SUM, COUNT, AVG
 │   └── system-flowchart.md            # Diagram Alur Bisnis Servis AHASS (Mermaid)
@@ -171,10 +173,15 @@ Tersedia tombol login demo otomatis pada halaman `/login`:
 - **Produktivitas Mekanik**: Pelacakan jumlah motor yang selesai diservis per Pit mekanik dan total pendapatan jasa mekanik.
 - **Peringatan Stok Menipis**: Peringatan dini otomatis ketika stok fisik suku cadang berada di bawah batas minimum (`stock <= min_stock`).
 
-### B. Kasir POS Billing & Engine Cetak Ganda
+### B. Kasir POS Billing & Engine Cetak Ganda Terisolasi (Isolated Print Engine)
 - **Pencegahan Floating-Point Drift**: Nilai moneter dikalkulasi menggunakan `shopspring/decimal` tanpa galat pembulatan IEEE-754.
-- **Cetak Struk POS Thermal (58mm / 80mm)**: Format struk ESC/POS lengkap dengan header bengkel resmi AHASS Nusantara Sakti, data no. polisi plat motor, rincian part/jasa, PPN 11%, dan syarat garansi servis 500 KM.
-- **Faktur Resmi Servis A4 (GoFPDF)**: Berkas PDF resmi berstandar A4 yang dihasilkan langsung dari backend Go, memuat rincian pekerjaan, tanda tangan ganda (*Pelanggan* & *Service Advisor*), serta stempel verifikasi digital AHASS.
+- **Engine Cetak Thermal ESC/POS (`src/utils/printer.ts`)**:
+  - Menggunakan teknik injeksi iframe terisolasi (`@page { size: 58mm auto; margin: 0; }` / `80mm`) yang memblokir header/footer bawaan browser (*URL & Page numbers*).
+  - Merender grafis simulasi *barcode* horizontal dan teks struk monospaced kontras tinggi.
+  - Bebas dari *popup blocker* yang biasa merusak fungsi `window.open` pada browser modern.
+- **Cetak Langsung Faktur A4 & Unduh PDF Resmi (GoFPDF)**:
+  - Tombol **Cetak A4 Langsung**: Merender lembar faktur resmi tanda tangan ganda dengan margin presisi A4 portrait tanpa elemen backdrop modal.
+  - Tombol **Unduh PDF Resmi**: Berkas PDF binary formal berstandar A4 yang dihasilkan langsung dari backend Go via library `jung-kurt/gofpdf`.
 
 ```text
 ========================================

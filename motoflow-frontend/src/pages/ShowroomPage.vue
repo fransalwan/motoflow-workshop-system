@@ -564,6 +564,7 @@ import { useCustomerStore } from '../stores/customer'
 import { useToastStore } from '../stores/toast'
 import { formatRupiah, formatDate } from '../utils/format'
 import { playSuccessChime, playClickSound } from '../utils/sound'
+import { printThermalReceipt } from '../utils/printer'
 import type { MotorUnit } from '../types/showroom'
 
 const showroomStore = useShowroomStore()
@@ -702,7 +703,11 @@ async function openSPKReceipt(spkId: number) {
 }
 
 function printReceipt() {
-  window.print()
+  printThermalReceipt(receiptText.value, {
+    widthMm: 80,
+    title: 'Surat Pemesanan Kendaraan (SPK) - PT Nusantara Sakti Group',
+    barcodeText: 'SPK-NSS-HONDA',
+  })
 }
 </script>
 

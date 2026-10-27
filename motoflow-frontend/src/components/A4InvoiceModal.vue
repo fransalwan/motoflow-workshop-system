@@ -10,7 +10,15 @@
         </div>
         <div class="flex items-center space-x-2 sm:space-x-3">
           <button 
+            @click="printDirect"
+            title="Cetak langsung ke printer A4"
+            class="inline-flex items-center space-x-1 sm:space-x-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg shadow-xs transition active:scale-95 border border-slate-700">
+            <Printer class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-300" />
+            <span class="hidden xs:inline">Cetak A4</span>
+          </button>
+          <button 
             @click="downloadPDF"
+            title="Unduh dokumen PDF resmi"
             class="inline-flex items-center space-x-1 sm:space-x-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-2.5 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition active:scale-95">
             <Download class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span class="hidden xs:inline">Unduh PDF</span>
@@ -23,7 +31,9 @@
 
       <!-- A4 Sheet Paper Preview (Horizontally scrollable on mobile) -->
       <div class="p-2 sm:p-8 bg-slate-100 max-h-[75vh] overflow-x-auto overflow-y-auto flex justify-start sm:justify-center">
-        <div class="bg-white w-[210mm] min-w-[700px] min-h-[260mm] p-6 sm:p-8 shadow-xl border border-slate-200 rounded-sm text-slate-900 flex flex-col justify-between">
+        <div 
+          ref="invoiceSheetRef"
+          class="bg-white w-[210mm] min-w-[700px] min-h-[260mm] p-6 sm:p-8 shadow-xl border border-slate-200 rounded-sm text-slate-900 flex flex-col justify-between">
           <div>
             <!-- AHASS Official Red Header Bar -->
             <div class="bg-red-700 text-white text-center py-2 px-4 rounded font-bold text-xs tracking-wider uppercase mb-6">
@@ -167,8 +177,10 @@
 </template>
 
 <script setup lang="ts">
-import { FileText, Download, X } from 'lucide-vue-next'
+import { ref } from 'vue'
+import { FileText, Download, X, Printer } from 'lucide-vue-next'
 import { formatRupiah, formatDate } from '../utils/format'
+import { printA4Document } from '../utils/printer'
 import type { WorkOrder } from '../types'
 
 const props = defineProps<{
@@ -177,6 +189,13 @@ const props = defineProps<{
 }>()
 
 defineEmits(['close'])
+
+const invoiceSheetRef = ref<HTMLElement | null>(null)
+
+function printDirect() {
+  if (!invoiceSheetRef.value) return
+  printA4Document(invoiceSheetRef.value, `Faktur Servis AHASS - ${props.workOrder?.wo_number || ''}`)
+}
 
 function downloadPDF() {
   if (!props.workOrder) return

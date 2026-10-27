@@ -81,6 +81,7 @@
 import { ref, watch } from 'vue'
 import { Printer, X, Copy } from 'lucide-vue-next'
 import { useWorkOrderStore } from '../stores/workOrder'
+import { printThermalReceipt } from '../utils/printer'
 import type { WorkOrder } from '../types'
 
 const props = defineProps<{
@@ -126,26 +127,11 @@ function copyText() {
 }
 
 function printReceipt() {
-  const printWindow = window.open('', '_blank', 'width=450,height=600')
-  if (!printWindow) return
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>Struk POS AHASS - ${props.workOrder?.wo_number}</title>
-        <style>
-          body { font-family: monospace; font-size: 11px; margin: 10px; padding: 0; white-space: pre-wrap; }
-          @media print { body { width: ${selectedWidth.value}mm; } }
-        </style>
-      </head>
-      <body>${receiptText.value}</body>
-    </html>
-  `)
-  printWindow.document.close()
-  printWindow.focus()
-  setTimeout(() => {
-    printWindow.print()
-    printWindow.close()
-  }, 250)
+  printThermalReceipt(receiptText.value, {
+    widthMm: selectedWidth.value,
+    title: `Struk POS AHASS - ${props.workOrder?.wo_number || ''}`,
+    barcodeText: props.workOrder?.wo_number,
+  })
 }
 </script>
 
