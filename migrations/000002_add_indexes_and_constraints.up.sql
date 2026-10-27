@@ -8,3 +8,4 @@ CREATE INDEX IF NOT EXISTS idx_work_order_items_order ON work_order_items(work_o
 
 ALTER TABLE work_orders ADD CONSTRAINT chk_wo_totals CHECK (grand_total >= 0);
 ALTER TABLE spareparts ADD CONSTRAINT chk_spareparts_selling_price CHECK (selling_price >= 0);
+

@@ -8,3 +8,4 @@ DROP INDEX IF EXISTS idx_work_order_items_order;
 
 ALTER TABLE work_orders DROP CONSTRAINT IF EXISTS chk_wo_totals;
 ALTER TABLE spareparts DROP CONSTRAINT IF EXISTS chk_spareparts_selling_price;
+

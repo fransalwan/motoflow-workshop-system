@@ -86,6 +86,18 @@ motoflow-workshop-system/
 └── README.md                          # Dokumentasi Utama
 ```
 
+### Diagram Topologi Arsitektur Produksi
+
+```mermaid
+graph TD
+    Client["Peramban Klien (Kasir / SA / HRD NSS)"] --> Tunnel["Cloudflare Secure Tunnel<br/>(HTTPS Public Gateway)"]
+    Tunnel --> Frontend["Frontend: Vue 3 SPA + Nginx Alpine<br/>(Port 80 / Reverse Proxy)"]
+    Frontend -- "API Proxy: /api/v1/*" --> Backend["Backend: Golang Gin Framework<br/>(Decimal Engine & Concurrency Lock)"]
+    Backend --> Cache["Caching Layer: In-Memory TTL & Redis<br/>(Dashboard Metrics & Fast-Moving Parts)"]
+    Backend --> DB[("Database: PostgreSQL 16 Enterprise<br/>(DDL, Foreign Keys, ACID & Advisory Locks)")]
+    Backend --> PDF["GoFPDF Engine<br/>(Faktur Resmi A4 & Struk Thermal POS)"]
+```
+
 ---
 
 ## 4. Alur Proses Bisnis Servis AHASS
@@ -168,7 +180,18 @@ npm run dev
 npm run build
 ```
 
-Buka peramban di `http://localhost:5173` dan masuk dengan salah satu akun demo.
+### Langkah 3: Menjalankan Seluruh Stack via Docker Compose (Produksi)
+Untuk menjalankan seluruh ekosistem (*PostgreSQL 16, Redis 7, Golang Backend, dan Nginx Frontend*) hanya dengan 1 perintah:
+```bash
+docker compose up --build -d
+```
+Aplikasi web akan tersedia di port `http://localhost` (Port 80) dan API Backend di `http://localhost:8080`.
+
+### Langkah 4: Menjalankan Database Migrations (Opsional untuk Produksi)
+```bash
+# Menjalankan migrasi DDL formal
+migrate -path migrations/ -database "postgres://postgres:password123@localhost:5432/motoflow_ahass?sslmode=disable" up
+```
 
 ---
 

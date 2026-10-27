@@ -39,3 +39,4 @@ COPY --from=builder /app/motoflow-server /app/motoflow-server
 EXPOSE 8080
 
 ENTRYPOINT ["/app/motoflow-server"]
+
