@@ -108,8 +108,8 @@
           </button>
         </div>
 
-        <!-- Items Table -->
-        <div class="overflow-x-auto">
+        <!-- Desktop Items Table -->
+        <div class="hidden sm:block overflow-x-auto">
           <table class="w-full text-xs text-left">
             <thead>
               <tr class="border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px]">
@@ -171,9 +171,81 @@
           </table>
         </div>
 
+        <!-- Mobile Items Cards (< 640px) -->
+        <div class="sm:hidden space-y-3">
+          <div
+            v-for="(row, idx) in selectedItems"
+            :key="idx"
+            class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5 text-xs"
+          >
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-[11px] text-slate-500 uppercase tracking-wider">Item #{{ idx + 1 }}</span>
+              <button
+                type="button"
+                @click="removeItemRow(idx)"
+                :disabled="selectedItems.length <= 1"
+                class="p-1 text-slate-400 hover:text-red-600 disabled:opacity-30 transition"
+              >
+                <Trash2 class="w-4 h-4" />
+              </button>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-500 mb-1">Pilih Suku Cadang / Jasa</label>
+              <select
+                v-model="row.sparepart_id"
+                @change="onSparepartSelect(row)"
+                required
+                class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-2 text-xs focus:outline-none focus:border-red-500"
+              >
+                <option :value="null" disabled>-- Pilih Part / Jasa --</option>
+                <option v-for="part in sparepartStore.spareparts" :key="part.id" :value="part.id">
+                  [{{ part.type === 'service' ? 'JASA' : 'PART' }}] {{ part.name }} ({{ formatRupiah(part.selling_price) }})
+                </option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <div>
+                <label class="block text-[10px] font-semibold text-slate-500 mb-1">Jumlah (Qty)</label>
+                <div class="flex items-center space-x-1">
+                  <button
+                    type="button"
+                    @click="row.quantity = Math.max(1, row.quantity - 1)"
+                    class="w-7 h-7 bg-white border border-slate-200 rounded text-slate-700 font-bold hover:bg-slate-100 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                  <input
+                    v-model.number="row.quantity"
+                    type="number"
+                    min="1"
+                    required
+                    class="w-12 bg-white border border-slate-200 rounded py-1 text-center font-mono font-bold text-xs"
+                  />
+                  <button
+                    type="button"
+                    @click="row.quantity++"
+                    class="w-7 h-7 bg-white border border-slate-200 rounded text-slate-700 font-bold hover:bg-slate-100 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <div class="text-right flex flex-col justify-end">
+                <span class="text-[10px] text-slate-400">Subtotal</span>
+                <span class="font-mono font-bold text-slate-900 text-xs">
+                  {{ formatRupiah(Number(row.price) * row.quantity) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Financial Summary Calculator -->
         <div class="mt-6 pt-6 border-t border-slate-200 flex justify-end">
-          <div class="w-80 space-y-2 text-xs">
+          <div class="w-full sm:w-80 space-y-2 text-xs">
             <div class="flex justify-between text-slate-600">
               <span>Subtotal Suku Cadang:</span>
               <span class="font-mono font-semibold">{{ formatRupiah(calculatedPartsSubtotal) }}</span>
@@ -195,16 +267,16 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center justify-end space-x-4">
+      <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:space-x-4">
         <router-link
           to="/work-orders"
-          class="px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-300 rounded-xl shadow-xs transition">
+          class="w-full sm:w-auto text-center px-5 py-2.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-300 rounded-xl shadow-xs transition">
           Batal
         </router-link>
         <button
           type="submit"
           :disabled="workOrderStore.loading"
-          class="px-6 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md transition disabled:opacity-50">
+          class="w-full sm:w-auto text-center px-6 py-2.5 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md transition disabled:opacity-50">
           <span v-if="!workOrderStore.loading">Terbitkan Work Order (WO)</span>
           <span v-else>Memproses WO...</span>
         </button>

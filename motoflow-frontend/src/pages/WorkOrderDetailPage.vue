@@ -95,10 +95,36 @@
         </div>
       </div>
 
+      <!-- Mobile View Tab Switcher (< lg) -->
+      <div class="lg:hidden flex bg-slate-200/80 p-1 rounded-2xl text-xs font-bold">
+        <button
+          @click="mobileTab = 'items'"
+          :class="mobileTab === 'items' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'"
+          class="flex-1 py-2.5 rounded-xl transition flex items-center justify-center space-x-1.5"
+        >
+          <PackageCheck class="w-4 h-4" />
+          <span>Rincian Servis & Part</span>
+        </button>
+        <button
+          @click="mobileTab = 'cashier'"
+          :class="mobileTab === 'cashier' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'"
+          class="flex-1 py-2.5 rounded-xl transition flex items-center justify-center space-x-1.5 relative"
+        >
+          <CreditCard class="w-4 h-4" />
+          <span>Kasir POS & Unit</span>
+          <span
+            v-if="wo.payment_status !== 'paid'"
+            class="w-2 h-2 rounded-full bg-amber-500 animate-pulse ml-1"
+          ></span>
+        </button>
+      </div>
+
       <!-- 2-Columns: Left Items, Right Customer & POS Cashier Terminal -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left: Items & Parts Table (2 Cols) -->
-        <div class="lg:col-span-2 space-y-6">
+        <div 
+          :class="mobileTab === 'items' ? 'block' : 'hidden lg:block'"
+          class="lg:col-span-2 space-y-6">
           <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
             <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider">Rincian Suku Cadang HGP & Jasa Mekanik</h3>
 
@@ -175,7 +201,9 @@
         </div>
 
         <!-- Right: Customer Info & POS Cashier Terminal (1 Col) -->
-        <div class="space-y-6">
+        <div 
+          :class="mobileTab === 'cashier' ? 'block' : 'hidden lg:block'"
+          class="space-y-6">
           <!-- Customer & Bike Card -->
           <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-3 text-xs">
             <h4 class="font-bold text-slate-800 uppercase tracking-wider text-[11px] border-b border-slate-100 pb-2">
@@ -321,6 +349,24 @@
           </div>
         </div>
       </div>
+
+      <!-- Floating Sticky Pay Bar (Mobile Only: Visible when on Items tab and WO is unpaid) -->
+      <div
+        v-if="wo && mobileTab === 'items' && wo.payment_status !== 'paid'"
+        class="lg:hidden fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-3 right-3 z-30 bg-slate-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-2xl flex items-center justify-between border border-slate-800 animate-in slide-in-from-bottom duration-200"
+      >
+        <div>
+          <span class="text-[10px] text-slate-400 block font-medium">Total Tagihan Servis</span>
+          <span class="text-sm font-black font-mono text-white">{{ formatRupiah(wo.grand_total) }}</span>
+        </div>
+        <button
+          @click="mobileTab = 'cashier'"
+          class="bg-red-600 hover:bg-red-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center space-x-1.5 shadow-md active:scale-95 transition"
+        >
+          <CreditCard class="w-4 h-4" />
+          <span>Bayar Kasir</span>
+        </button>
+      </div>
     </div>
 
     <!-- Thermal Receipt Modal -->
@@ -347,7 +393,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { Printer, FileText, QrCode } from 'lucide-vue-next'
+import { Printer, FileText, QrCode, PackageCheck, CreditCard } from 'lucide-vue-next'
 import { useWorkOrderStore } from '../stores/workOrder'
 import { useToastStore } from '../stores/toast'
 import { playScannerBeep, playSuccessChime, playClickSound } from '../utils/sound'
@@ -362,6 +408,7 @@ const route = useRoute()
 const workOrderStore = useWorkOrderStore()
 const toastStore = useToastStore()
 
+const mobileTab = ref<'items' | 'cashier'>('items')
 const wo = computed(() => workOrderStore.currentWorkOrder)
 
 const showThermalModal = ref(false)

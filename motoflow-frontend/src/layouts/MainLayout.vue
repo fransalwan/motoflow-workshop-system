@@ -9,7 +9,7 @@
     <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
       <Navbar @toggle-mobile-menu="isMobileMenuOpen = !isMobileMenuOpen" />
 
-      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
+      <main class="flex-1 overflow-y-auto p-3.5 sm:p-6 lg:p-8 pb-28 lg:pb-8">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
@@ -17,15 +17,15 @@
         </router-view>
       </main>
 
-      <!-- Mobile Bottom Navigation Bar (Dynamic Role-Based) -->
-      <nav class="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-md border-t border-slate-200 flex items-center justify-around px-2 z-40 shadow-lg">
+      <!-- Mobile Bottom Navigation Bar (Dynamic Role-Based & Safe-Area Aware) -->
+      <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/90 flex items-center justify-around px-2 z-40 shadow-lg pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1">
         <router-link
           v-for="item in visibleBottomItems"
           :key="item.to"
           :to="item.to"
-          class="flex flex-col items-center justify-center transition"
-          :class="item.isCenter ? '-mt-5' : 'w-14 py-1 text-[10px] font-semibold ' + ($route.path === item.to ? 'text-red-600' : 'text-slate-400')">
-          <div v-if="item.isCenter" class="w-12 h-12 rounded-full bg-gradient-to-tr from-red-700 to-red-500 text-white flex items-center justify-center shadow-lg shadow-red-900/30 border-4 border-white active:scale-90 transition">
+          class="flex flex-col items-center justify-center transition active:scale-90"
+          :class="item.isCenter ? '-mt-5' : 'w-14 py-1 text-[10px] font-semibold ' + ($route.path === item.to ? 'text-red-600 font-bold' : 'text-slate-400')">
+          <div v-if="item.isCenter" class="w-12 h-12 rounded-full bg-gradient-to-tr from-red-700 to-red-500 text-white flex items-center justify-center shadow-lg shadow-red-900/30 border-4 border-white transition-transform">
             <component :is="item.icon" class="w-5 h-5 stroke-[2.2]" />
           </div>
           <component v-else :is="item.icon" class="w-5 h-5 mb-0.5" />

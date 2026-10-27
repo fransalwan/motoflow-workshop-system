@@ -244,8 +244,9 @@
     </div>
 
     <!-- MODAL 1: INTERACTIVE CREDIT SIMULATOR NSC FINANCE -->
-    <div v-if="showSimulatorModal && activeUnit" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 space-y-5">
+    <div v-if="showSimulatorModal && activeUnit" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-lg w-full p-5 sm:p-6 border border-slate-200 space-y-4 max-h-[92vh] overflow-y-auto">
+        <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto -mt-1 mb-1 sm:hidden"></div>
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div class="flex items-center space-x-2">
             <Calculator class="w-5 h-5 text-red-600" />
@@ -364,8 +365,9 @@
     </div>
 
     <!-- MODAL 2: PENERBITAN SPK RESMI -->
-    <div v-if="showSPKModal && activeUnit" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 space-y-4">
+    <div v-if="showSPKModal && activeUnit" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-lg w-full p-5 sm:p-6 border border-slate-200 space-y-4 max-h-[92vh] overflow-y-auto">
+        <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto -mt-1 mb-1 sm:hidden"></div>
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div class="flex items-center space-x-2">
             <FileText class="w-5 h-5 text-red-600" />
@@ -509,8 +511,9 @@
     </div>
 
     <!-- MODAL 3: SPK RECEIPT / DOKUMEN -->
-    <div v-if="showReceiptModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 space-y-4">
+    <div v-if="showReceiptModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-lg w-full p-5 sm:p-6 border border-slate-200 space-y-4 max-h-[92vh] overflow-y-auto">
+        <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto -mt-1 mb-1 sm:hidden"></div>
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div class="flex items-center space-x-2">
             <Printer class="w-5 h-5 text-red-600" />

@@ -15,19 +15,19 @@
       </div>
 
       <!-- Search & Add Button -->
-      <div class="flex items-center space-x-3">
-        <div class="relative">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+        <div class="relative flex-1 sm:w-72">
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Cari part number atau nama part..."
-            class="bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 w-72 shadow-xs" />
+            class="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 shadow-xs" />
           <Search class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
         </div>
 
         <button
           @click="showAddModal = true"
-          class="inline-flex items-center space-x-1.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs transition">
+          class="inline-flex items-center justify-center space-x-1.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs px-4 py-2.5 sm:py-2 rounded-xl shadow-xs transition active:scale-95">
           <Plus class="w-4 h-4" />
           <span>Tambah Part</span>
         </button>
@@ -131,8 +131,9 @@
     </div>
 
     <!-- Modal Adjust Stock -->
-    <div v-if="showAdjustModal && selectedPart" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 border border-slate-200">
+    <div v-if="showAdjustModal && selectedPart" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl max-w-sm w-full p-5 sm:p-6 border border-slate-200 max-h-[92vh] overflow-y-auto">
+        <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto -mt-1 mb-2 sm:hidden"></div>
         <h3 class="font-bold text-slate-900 text-sm mb-1">Penyesuaian Stok Gudang</h3>
         <p class="text-xs text-slate-500 font-mono mb-4">{{ selectedPart.part_number }} - {{ selectedPart.name }}</p>
 

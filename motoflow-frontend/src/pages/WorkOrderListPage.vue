@@ -61,195 +61,227 @@
     </div>
 
     <!-- VIEW 1: KANBAN WORKSHOP PIT BOARD -->
-    <div v-else-if="viewMode === 'kanban'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
-      <!-- Column 1: Draft / Pendaftaran SA -->
-      <div class="bg-slate-100/80 p-3.5 rounded-2xl border border-slate-200/80 space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <div class="flex items-center space-x-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-            <h4 class="font-bold text-xs text-slate-800 uppercase tracking-wider">1. Pendaftaran SA</h4>
-          </div>
-          <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-full font-mono">
-            {{ getOrdersByStatus('draft').length }}
+    <div v-else-if="viewMode === 'kanban'" class="space-y-4">
+      <!-- Mobile Kanban Column Tab Switcher (< md) -->
+      <div class="md:hidden flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs font-bold">
+        <button
+          v-for="col in kanbanColumns"
+          :key="col.status"
+          @click="mobileKanbanCol = col.status"
+          :class="[
+            'px-3 py-2 rounded-xl flex items-center space-x-1.5 whitespace-nowrap transition-all shadow-xs',
+            mobileKanbanCol === col.status
+              ? 'bg-slate-900 text-white font-extrabold ring-2 ring-red-500'
+              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+          ]"
+        >
+          <span :class="['w-2 h-2 rounded-full', col.dotClass]"></span>
+          <span>{{ col.label }}</span>
+          <span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-mono" :class="col.badgeClass">
+            {{ getOrdersByStatus(col.status).length }}
           </span>
-        </div>
-
-        <div class="space-y-3 min-h-[300px]">
-          <div 
-            v-for="wo in getOrdersByStatus('draft')" 
-            :key="wo.id" 
-            class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs hover:border-red-400 transition space-y-2.5 group">
-            <div class="flex items-center justify-between">
-              <span class="font-mono font-bold text-xs bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-slate-900">
-                {{ wo.customer?.plate_number }}
-              </span>
-              <span class="text-[10px] font-mono text-slate-400">{{ formatDate(wo.created_at) }}</span>
-            </div>
-
-            <div>
-              <h5 class="font-bold text-slate-800 text-xs truncate">{{ wo.customer?.motor_model }}</h5>
-              <p class="text-[11px] text-slate-500 truncate">{{ wo.customer?.name }}</p>
-            </div>
-
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-              <span class="font-mono font-bold text-xs text-slate-900">{{ formatRupiah(wo.grand_total) }}</span>
-              <button 
-                @click="advanceStatus(wo.id, 'in_progress')"
-                class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg transition flex items-center space-x-1">
-                <span>Ke Pit</span>
-                <ArrowRight class="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-
-          <div v-if="getOrdersByStatus('draft').length === 0" class="text-center py-10 text-slate-400 text-xs">
-            Antrean kosong
-          </div>
-        </div>
+        </button>
       </div>
 
-      <!-- Column 2: In Progress (Pit Servis) -->
-      <div class="bg-blue-50/50 p-3.5 rounded-2xl border border-blue-200/60 space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <div class="flex items-center space-x-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping"></span>
-            <h4 class="font-bold text-xs text-blue-900 uppercase tracking-wider">2. Dikerjakan (Pit)</h4>
-          </div>
-          <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded-full font-mono">
-            {{ getOrdersByStatus('in_progress').length }}
-          </span>
-        </div>
-
-        <div class="space-y-3 min-h-[300px]">
-          <div 
-            v-for="wo in getOrdersByStatus('in_progress')" 
-            :key="wo.id" 
-            class="bg-white p-4 rounded-xl border border-blue-200 shadow-xs hover:border-blue-400 transition space-y-2.5">
-            <div class="flex items-center justify-between">
-              <span class="font-mono font-black text-xs bg-blue-100 text-blue-900 px-2 py-0.5 rounded border border-blue-300">
-                {{ wo.customer?.plate_number }}
-              </span>
-              <span v-if="wo.mechanic" class="text-[10px] font-bold bg-red-100 text-red-700 px-1.5 py-0.5 rounded">
-                PIT {{ wo.mechanic.pit_number }}
-              </span>
+      <!-- Kanban Grid (Mobile: Show selected column; Desktop: Show all 4) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
+        <!-- Column 1: Draft / Pendaftaran SA -->
+        <div 
+          :class="[mobileKanbanCol === 'draft' ? 'block' : 'hidden md:block']"
+          class="bg-slate-100/80 p-3.5 rounded-2xl border border-slate-200/80 space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              <h4 class="font-bold text-xs text-slate-800 uppercase tracking-wider">1. Pendaftaran SA</h4>
             </div>
-
-            <div>
-              <h5 class="font-bold text-slate-800 text-xs">{{ wo.customer?.motor_model }}</h5>
-              <p class="text-[11px] text-slate-500">{{ wo.mechanic?.name || 'Mekanik Servis' }}</p>
-            </div>
-
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-              <span class="font-mono font-bold text-xs text-slate-900">{{ formatRupiah(wo.grand_total) }}</span>
-              <button 
-                @click="advanceStatus(wo.id, 'completed')"
-                class="bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg transition flex items-center space-x-1">
-                <span>Selesai QC</span>
-                <Check class="w-3 h-3" />
-              </button>
-            </div>
+            <span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-full font-mono">
+              {{ getOrdersByStatus('draft').length }}
+            </span>
           </div>
 
-          <div v-if="getOrdersByStatus('in_progress').length === 0" class="text-center py-10 text-slate-400 text-xs">
-            Pit sedang kosong
-          </div>
-        </div>
-      </div>
+          <div class="space-y-3 min-h-[300px]">
+            <div 
+              v-for="wo in getOrdersByStatus('draft')" 
+              :key="wo.id" 
+              class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs hover:border-red-400 transition space-y-2.5 group">
+              <div class="flex items-center justify-between">
+                <span class="font-mono font-bold text-xs bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-slate-900">
+                  {{ wo.customer?.plate_number }}
+                </span>
+                <span class="text-[10px] font-mono text-slate-400">{{ formatDate(wo.created_at) }}</span>
+              </div>
 
-      <!-- Column 3: Selesai / Menunggu Kasir -->
-      <div class="bg-purple-50/50 p-3.5 rounded-2xl border border-purple-200/60 space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <div class="flex items-center space-x-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
-            <h4 class="font-bold text-xs text-purple-900 uppercase tracking-wider">3. Selesai (Kasir)</h4>
-          </div>
-          <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded-full font-mono">
-            {{ getOrdersByStatus('completed').length }}
-          </span>
-        </div>
+              <div>
+                <h5 class="font-bold text-slate-800 text-xs truncate">{{ wo.customer?.motor_model }}</h5>
+                <p class="text-[11px] text-slate-500 truncate">{{ wo.customer?.name }}</p>
+              </div>
 
-        <div class="space-y-3 min-h-[300px]">
-          <div 
-            v-for="wo in getOrdersByStatus('completed')" 
-            :key="wo.id" 
-            class="bg-white p-4 rounded-xl border border-purple-200 shadow-xs hover:border-purple-400 transition space-y-2.5">
-            <div class="flex items-center justify-between">
-              <span class="font-mono font-bold text-xs bg-slate-100 text-slate-900 px-2 py-0.5 rounded border border-slate-200">
-                {{ wo.customer?.plate_number }}
-              </span>
-              <span class="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">
-                Lolos QC
-              </span>
-            </div>
-
-            <div>
-              <h5 class="font-bold text-slate-800 text-xs">{{ wo.customer?.motor_model }}</h5>
-              <p class="text-[11px] text-slate-500">{{ wo.customer?.name }}</p>
-            </div>
-
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-              <span class="font-mono font-bold text-xs text-purple-900">{{ formatRupiah(wo.grand_total) }}</span>
-              <router-link 
-                :to="`/work-orders/${wo.id}`"
-                class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg transition flex items-center space-x-1">
-                <CreditCard class="w-3 h-3" />
-                <span>Buka Kasir</span>
-              </router-link>
-            </div>
-          </div>
-
-          <div v-if="getOrdersByStatus('completed').length === 0" class="text-center py-10 text-slate-400 text-xs">
-            Tidak ada motor di kasir
-          </div>
-        </div>
-      </div>
-
-      <!-- Column 4: Lunas / Paid -->
-      <div class="bg-emerald-50/50 p-3.5 rounded-2xl border border-emerald-200/60 space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <div class="flex items-center space-x-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-            <h4 class="font-bold text-xs text-emerald-900 uppercase tracking-wider">4. Lunas (Paid)</h4>
-          </div>
-          <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full font-mono">
-            {{ getOrdersByStatus('paid').length }}
-          </span>
-        </div>
-
-        <div class="space-y-3 min-h-[300px]">
-          <div 
-            v-for="wo in getOrdersByStatus('paid').slice(0, 6)" 
-            :key="wo.id" 
-            class="bg-white p-4 rounded-xl border border-emerald-200/80 shadow-xs space-y-2.5">
-            <div class="flex items-center justify-between">
-              <span class="font-mono font-bold text-xs bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
-                {{ wo.customer?.plate_number }}
-              </span>
-              <span class="text-[10px] uppercase font-mono font-bold text-emerald-600">
-                {{ wo.payment_method }}
-              </span>
-            </div>
-
-            <div>
-              <h5 class="font-bold text-slate-800 text-xs">{{ wo.customer?.motor_model }}</h5>
-              <p class="text-[11px] text-slate-500">{{ wo.customer?.name }}</p>
-            </div>
-
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-              <span class="font-mono font-bold text-xs text-emerald-700">{{ formatRupiah(wo.grand_total) }}</span>
-              <div class="flex items-center space-x-1">
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span class="font-mono font-bold text-xs text-slate-900">{{ formatRupiah(wo.grand_total) }}</span>
                 <button 
-                  @click="openThermalModal(wo)"
-                  title="Struk Thermal"
-                  class="p-1 bg-slate-100 hover:bg-slate-200 rounded text-slate-600">
-                  <Printer class="w-3.5 h-3.5" />
+                  @click="advanceStatus(wo.id, 'in_progress')"
+                  class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg transition flex items-center space-x-1">
+                  <span>Ke Pit</span>
+                  <ArrowRight class="w-3 h-3" />
                 </button>
+              </div>
+            </div>
+
+            <div v-if="getOrdersByStatus('draft').length === 0" class="text-center py-10 text-slate-400 text-xs">
+              Antrean kosong
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: In Progress (Pit Servis) -->
+        <div 
+          :class="[mobileKanbanCol === 'in_progress' ? 'block' : 'hidden md:block']"
+          class="bg-blue-50/50 p-3.5 rounded-2xl border border-blue-200/60 space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping"></span>
+              <h4 class="font-bold text-xs text-blue-900 uppercase tracking-wider">2. Dikerjakan (Pit)</h4>
+            </div>
+            <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-2 py-0.5 rounded-full font-mono">
+              {{ getOrdersByStatus('in_progress').length }}
+            </span>
+          </div>
+
+          <div class="space-y-3 min-h-[300px]">
+            <div 
+              v-for="wo in getOrdersByStatus('in_progress')" 
+              :key="wo.id" 
+              class="bg-white p-4 rounded-xl border border-blue-200 shadow-xs hover:border-blue-400 transition space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="font-mono font-black text-xs bg-blue-100 text-blue-900 px-2 py-0.5 rounded border border-blue-300">
+                  {{ wo.customer?.plate_number }}
+                </span>
+                <span v-if="wo.mechanic" class="text-[10px] font-bold bg-red-100 text-red-700 px-1.5 py-0.5 rounded">
+                  PIT {{ wo.mechanic.pit_number }}
+                </span>
+              </div>
+
+              <div>
+                <h5 class="font-bold text-slate-800 text-xs">{{ wo.customer?.motor_model }}</h5>
+                <p class="text-[11px] text-slate-500">{{ wo.mechanic?.name || 'Mekanik Servis' }}</p>
+              </div>
+
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span class="font-mono font-bold text-xs text-slate-900">{{ formatRupiah(wo.grand_total) }}</span>
                 <button 
-                  @click="openA4Modal(wo)"
-                  title="Faktur A4"
-                  class="p-1 bg-slate-100 hover:bg-slate-200 rounded text-slate-600">
-                  <FileText class="w-3.5 h-3.5" />
+                  @click="advanceStatus(wo.id, 'completed')"
+                  class="bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg transition flex items-center space-x-1">
+                  <span>Selesai QC</span>
+                  <Check class="w-3 h-3" />
                 </button>
+              </div>
+            </div>
+
+            <div v-if="getOrdersByStatus('in_progress').length === 0" class="text-center py-10 text-slate-400 text-xs">
+              Pit sedang kosong
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Selesai / Menunggu Kasir -->
+        <div 
+          :class="[mobileKanbanCol === 'completed' ? 'block' : 'hidden md:block']"
+          class="bg-purple-50/50 p-3.5 rounded-2xl border border-purple-200/60 space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+              <h4 class="font-bold text-xs text-purple-900 uppercase tracking-wider">3. Selesai (Kasir)</h4>
+            </div>
+            <span class="bg-purple-100 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded-full font-mono">
+              {{ getOrdersByStatus('completed').length }}
+            </span>
+          </div>
+
+          <div class="space-y-3 min-h-[300px]">
+            <div 
+              v-for="wo in getOrdersByStatus('completed')" 
+              :key="wo.id" 
+              class="bg-white p-4 rounded-xl border border-purple-200 shadow-xs hover:border-purple-400 transition space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="font-mono font-bold text-xs bg-slate-100 text-slate-900 px-2 py-0.5 rounded border border-slate-200">
+                  {{ wo.customer?.plate_number }}
+                </span>
+                <span class="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">
+                  Lolos QC
+                </span>
+              </div>
+
+              <div>
+                <h5 class="font-bold text-slate-800 text-xs">{{ wo.customer?.motor_model }}</h5>
+                <p class="text-[11px] text-slate-500">{{ wo.customer?.name }}</p>
+              </div>
+
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span class="font-mono font-bold text-xs text-purple-900">{{ formatRupiah(wo.grand_total) }}</span>
+                <router-link 
+                  :to="`/work-orders/${wo.id}`"
+                  class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg transition flex items-center space-x-1">
+                  <CreditCard class="w-3 h-3" />
+                  <span>Buka Kasir</span>
+                </router-link>
+              </div>
+            </div>
+
+            <div v-if="getOrdersByStatus('completed').length === 0" class="text-center py-10 text-slate-400 text-xs">
+              Tidak ada motor di kasir
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 4: Lunas / Paid -->
+        <div 
+          :class="[mobileKanbanCol === 'paid' ? 'block' : 'hidden md:block']"
+          class="bg-emerald-50/50 p-3.5 rounded-2xl border border-emerald-200/60 space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+              <h4 class="font-bold text-xs text-emerald-900 uppercase tracking-wider">4. Lunas (Paid)</h4>
+            </div>
+            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full font-mono">
+              {{ getOrdersByStatus('paid').length }}
+            </span>
+          </div>
+
+          <div class="space-y-3 min-h-[300px]">
+            <div 
+              v-for="wo in getOrdersByStatus('paid').slice(0, 6)" 
+              :key="wo.id" 
+              class="bg-white p-4 rounded-xl border border-emerald-200/80 shadow-xs space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="font-mono font-bold text-xs bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                  {{ wo.customer?.plate_number }}
+                </span>
+                <span class="text-[10px] uppercase font-mono font-bold text-emerald-600">
+                  {{ wo.payment_method }}
+                </span>
+              </div>
+
+              <div>
+                <h5 class="font-bold text-slate-800 text-xs">{{ wo.customer?.motor_model }}</h5>
+                <p class="text-[11px] text-slate-500">{{ wo.customer?.name }}</p>
+              </div>
+
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span class="font-mono font-bold text-xs text-emerald-700">{{ formatRupiah(wo.grand_total) }}</span>
+                <div class="flex items-center space-x-1">
+                  <button 
+                    @click="openThermalModal(wo)"
+                    title="Struk Thermal"
+                    class="p-1 bg-slate-100 hover:bg-slate-200 rounded text-slate-600">
+                    <Printer class="w-3.5 h-3.5" />
+                  </button>
+                  <button 
+                    @click="openA4Modal(wo)"
+                    title="Faktur A4"
+                    class="p-1 bg-slate-100 hover:bg-slate-200 rounded text-slate-600">
+                    <FileText class="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -445,6 +477,14 @@ const toastStore = useToastStore()
 const searchQuery = ref('')
 const selectedTab = ref('all')
 const viewMode = ref<'table' | 'kanban'>('kanban') // Default to Kanban for visual impact!
+const mobileKanbanCol = ref<WorkOrderStatus>('draft')
+
+const kanbanColumns = [
+  { status: 'draft' as const, label: '1. Antrean SA', dotClass: 'bg-amber-500', badgeClass: 'bg-amber-100 text-amber-800' },
+  { status: 'in_progress' as const, label: '2. Pit Servis', dotClass: 'bg-blue-600', badgeClass: 'bg-blue-100 text-blue-800' },
+  { status: 'completed' as const, label: '3. Kasir POS', dotClass: 'bg-purple-600', badgeClass: 'bg-purple-100 text-purple-800' },
+  { status: 'paid' as const, label: '4. Selesai Lunas', dotClass: 'bg-emerald-600', badgeClass: 'bg-emerald-100 text-emerald-800' },
+]
 
 const filterTabs = [
   { label: 'Semua Status', value: 'all' },

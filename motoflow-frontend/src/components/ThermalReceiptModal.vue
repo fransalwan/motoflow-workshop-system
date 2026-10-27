@@ -1,11 +1,12 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+  <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 max-h-[92vh] flex flex-col">
+      <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto my-2 sm:hidden"></div>
       <!-- Modal Header -->
-      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+      <div class="bg-slate-900 text-white px-5 sm:px-6 py-4 flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <Printer class="w-5 h-5 text-red-500" />
-          <h3 class="font-bold text-lg">Cetak Struk Kasir POS Thermal</h3>
+          <h3 class="font-bold text-base sm:text-lg">Cetak Struk Kasir POS Thermal</h3>
         </div>
         <button @click="$emit('close')" class="text-slate-400 hover:text-white transition">
           <X class="w-5 h-5" />
@@ -13,30 +14,30 @@
       </div>
 
       <!-- Controls & Roll Width Selection -->
-      <div class="bg-slate-100 px-6 py-3 border-b border-slate-200 flex items-center justify-between text-xs font-medium text-slate-600">
+      <div class="bg-slate-100 px-4 sm:px-6 py-2.5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs font-medium text-slate-600">
         <div class="flex items-center space-x-2">
           <span>Lebar Kertas:</span>
           <button 
             @click="changeWidth(58)" 
             :class="selectedWidth === 58 ? 'bg-red-600 text-white font-bold' : 'bg-white text-slate-700 hover:bg-slate-200'"
-            class="px-2.5 py-1 rounded shadow-sm transition border border-slate-300">
-            58 mm (Standard)
+            class="px-2.5 py-1 rounded shadow-xs transition border border-slate-300">
+            58 mm
           </button>
           <button 
             @click="changeWidth(80)" 
             :class="selectedWidth === 80 ? 'bg-red-600 text-white font-bold' : 'bg-white text-slate-700 hover:bg-slate-200'"
-            class="px-2.5 py-1 rounded shadow-sm transition border border-slate-300">
-            80 mm (Wide)
+            class="px-2.5 py-1 rounded shadow-xs transition border border-slate-300">
+            80 mm
           </button>
         </div>
-        <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded font-mono">ESC/POS Ready</span>
+        <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded font-mono text-[10px]">ESC/POS Ready</span>
       </div>
 
       <!-- Thermal Paper Preview Area -->
-      <div class="p-6 bg-slate-200 flex justify-center max-h-[60vh] overflow-y-auto">
+      <div class="p-3 sm:p-6 bg-slate-200 flex justify-center max-h-[55vh] overflow-y-auto">
         <div 
-          :style="{ width: selectedWidth === 58 ? '300px' : '400px' }"
-          class="bg-white p-5 shadow-md border border-slate-300 font-mono text-xs leading-relaxed text-slate-900 print-area transition-all duration-200">
+          :style="{ width: selectedWidth === 58 ? 'min(300px, 100%)' : 'min(400px, 100%)' }"
+          class="bg-white p-4 sm:p-5 shadow-md border border-slate-300 font-mono text-xs leading-relaxed text-slate-900 print-area transition-all duration-200">
           
           <pre class="whitespace-pre-wrap font-mono">{{ receiptText }}</pre>
 

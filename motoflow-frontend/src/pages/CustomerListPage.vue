@@ -7,20 +7,20 @@
         <p class="text-xs text-slate-500">Pencatatan riwayat motor, nomor plat, nomor rangka, dan kilometer odometer</p>
       </div>
 
-      <div class="flex items-center space-x-3">
-        <div class="relative">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+        <div class="relative flex-1 sm:w-72">
           <input
             v-model="searchQuery"
             @input="onSearch"
             type="text"
             placeholder="Cari Plat, Nama, atau Model..."
-            class="bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 w-72 shadow-xs" />
+            class="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-red-500 shadow-xs" />
           <Search class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
         </div>
 
         <button
           @click="showAddModal = true"
-          class="inline-flex items-center space-x-1.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs transition">
+          class="inline-flex items-center justify-center space-x-1.5 bg-red-600 hover:bg-red-700 text-white font-semibold text-xs px-4 py-2.5 sm:py-2 rounded-xl shadow-xs transition active:scale-95">
           <Plus class="w-4 h-4" />
           <span>Tambah Pelanggan</span>
         </button>
@@ -100,9 +100,15 @@
     </div>
 
     <!-- Modal Tambah Pelanggan -->
-    <div v-if="showAddModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-200">
-        <h3 class="font-bold text-slate-900 text-base mb-4">Pendaftaran Pelanggan & Motor Honda Baru</h3>
+    <div v-if="showAddModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-xl max-w-lg w-full p-5 sm:p-6 border border-slate-200 max-h-[92vh] overflow-y-auto">
+        <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto -mt-1 mb-2 sm:hidden"></div>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-slate-900 text-base">Pendaftaran Pelanggan & Motor Honda Baru</h3>
+          <button @click="showAddModal = false" class="text-slate-400 hover:text-slate-600">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
 
         <form @submit.prevent="handleAddCustomer" class="space-y-4 text-xs">
           <div class="grid grid-cols-2 gap-4">
@@ -159,7 +165,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Search, Plus } from 'lucide-vue-next'
+import { Search, Plus, X } from 'lucide-vue-next'
 import { useCustomerStore } from '../stores/customer'
 import { useToastStore } from '../stores/toast'
 import { playSuccessChime } from '../utils/sound'

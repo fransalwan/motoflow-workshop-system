@@ -318,37 +318,60 @@ Sebagai bukti kesiapan ke tingkat *production-ready enterprise*, sistem telah di
 
 ---
 
-## 11. Mobile-First Responsive Experience & Inovasi UI/UX Bengkel AHASS
+## 11. Mobile-First Ergonomics & Inovasi UI/UX Bengkel AHASS
 
-Untuk menghadirkan pengalaman pengguna kelas industri yang siap diimplementasikan langsung di lantai bengkel (*workshop floor*) maupun ruang tunggu pelanggan resmi AHASS, sistem ini dilengkapi serangkaian inovasi antarmuka:
+Untuk menghadirkan pengalaman pengguna kelas industri yang siap diimplementasikan langsung di lantai bengkel (*workshop floor*) maupun ruang tunggu pelanggan resmi AHASS, sistem ini dirancang dengan standar **Mobile-First App Experience**:
 
-### A. Arsitektur Mobile-First & Bottom Navigation Bar
-- **Thumb-Friendly Bottom Navigation**: Navigasi bawah khusus perangkat smartphone/tablet untuk mekanik dan service advisor yang bergerak aktif di lantai pit servis (*Omzet, Servis, (+) Daftar WO Baru, Suku Cadang, Motor*).
-- **Responsive Card View**: Tampilan tabel otomatis bertransformasi menjadi kartu informatif berdensitas tinggi pada layar sentuh kecil (`< 768px`) dengan ukuran target sentuh ramah jempol (*minimum touch target 44px*).
-- **Mobile Drawer Sidebar**: Navigasi hamburger cerdas dengan *backdrop blur* yang otomatis tertutup begitu menu dipilih.
+### A. Konfigurasi Viewport & Safe-Area Inset Standar PWA
+- **Pencegahan Auto-Zoom iOS Safari**: Pengaturan `viewport-fit=cover, maximum-scale=1.0, user-scalable=no` memastikan kolom input teks tidak memicu pembesaran layar (*viewport shift*) saat disentuh teknisi di perangkat iPhone.
+- **Dukungan Bezel-less & Gesture Bar**: Penggunaan `env(safe-area-inset-bottom)` pada navigasi bawah dan kontainer utama memastikan tombol aksi tidak terpotong oleh garis *Home Indicator* iOS maupun bilah navigasi gestur Android.
+- **PWA Meta Tags**: Dilengkapi `<meta name="theme-color" content="#CC0000" />` dan `<meta name="apple-mobile-web-app-capable" content="yes" />` dengan status bar beraksen transparan resmi Honda Racing Red.
 
-### B. Workshop Kanban Pit Board View
-- **Dual-View Switcher**: Kasir dan kepala bengkel dapat beralih antara **Tampilan Tabel Tradisional** dan **Kanban Board Interaktif** (Kolom: `Draft` &rarr; `In Progress` &rarr; `Completed` &rarr; `Paid`).
-- **1-Click Quick Status Advance**: Mempercepat alur pengerjaan teknisi di pit tanpa perlu membuka form edit (*"Mulai Servis"*, *"Selesai Servis"*, *"Buka Kasir"*).
+### B. Sticky Floating Action Bar (Standar Moka POS, Grab & Tokopedia)
+- **POS Retail OTC (`/pos-retail`)**:
+  - **Mobile Segmented Switcher**: Membagi tampilan smartphone menjadi tab *Katalog Part* vs *Keranjang Belanja* untuk mencegah antrean barang menenggelamkan kolom kasir.
+  - **Sticky Floating Cart Bar**: Bilah keranjang melayang di atas navigasi bawah saat berada di katalog: `🛒 [X Item • Rp Total] [Lihat Keranjang & Bayar ➔]`, sehingga kasir cukup 1 ketukan jempol untuk langsung menyelesaikan transaksi.
+  - **Touch Stepper**: Tombol penambah dan pengurang kuantiti (*+ / -*) berukuran minimal 36px ramah jempol dengan umpan balik klik instan.
+- **Work Order Detail & Kasir Billing (`/work-orders/:id`)**:
+  - **Mobile Dual Tab**: Tab *Rincian Servis & Part* vs *Kasir POS & Unit* membuat kasir bengkel tidak perlu menggulir puluhan rincian baut dan oli untuk mengakses terminal pembayaran.
+  - **Sticky Floating Pay Bar**: Bilah aksi melayang `💰 [Total Rp X] [Bayar Kasir ➔]` aktif otomatis saat status nota masih belum lunas.
 
-### C. Kasir POS Keyboard Shortcuts (Hotkeys)
+### C. Kanban Pit Board dengan Mobile Column Switcher
+- **Segmented Column Tabs**: Pada layar smartphone (`< md`), 4 kolom Kanban yang biasanya menumpuk vertikal panjang (*infinite scrolling*) dikonversi menjadi bar navigasi kolom dinamis:
+  `[1. Antrean SA (X)]` `[2. Pit Servis (Y)]` `[3. Kasir POS (Z)]` `[4. Selesai Lunas (W)]`.
+- Hanya menampilkan kolom yang sedang dipantau secara fokus dan responsif, sementara pada layar tablet dan desktop (`>= md`) tetap menyajikan grid 4 kolom horizontal penuh.
+
+### D. Transformasi Dialog Modal Menjadi Native Mobile Bottom Sheets
+- Seluruh jendela modal kompleks pada sistem bertransisi secara mulus menjadi *Bottom Sheet* modern di layar ponsel (`rounded-t-3xl`, *drag handle bar*, pembatasan tinggi `max-h-[92vh]` dan *scrollable body*):
+  - **Kalkulator Kredit NSC Finance** & **Formulir SPK Resmi Showroom**.
+  - **Formulir Pendaftaran Pelanggan & Motor Honda Baru**.
+  - **Penyesuaian Stok Gudang HGP**.
+  - **Pratinjau Struk Kasir Thermal (58mm/80mm)** & **Faktur A4 Resmi**.
+- Menghilangkan bug terpotongnya tombol konfirmasi akibat keyboard sentuh (*virtual keyboard*) pada layar HP.
+
+### E. Responsive Card View & Form Pembuatan WO
+- **Kartu WO Interaktif**: Tabel antrean bertransformasi menjadi kartu berdensitas informasi tinggi pada layar kecil (`< 768px`) dengan status alur servis beranimasi.
+- **Formulir Item Servis Ramah Sentuh**: Formulir pendaftaran servis mengubah tabel 5 kolom menjadi kartu item berundak dengan pemilih suku cadang, pengatur kuantitas, dan kalkulator estimasi total biaya servis otomatis.
+- **Tren Kinerja Dashboard**: Grafik 7-hari dashboard eksekutif beradaptasi dari 7 kolom di desktop menjadi `grid-cols-2` di mobile untuk keterbacaan metrik pendapatan harian.
+
+### F. Kasir POS Keyboard Shortcuts (Hotkeys)
 Mendukung alur transaksi kasir super cepat di jam sibuk tanpa perlu menyentuh mouse:
 - <kbd>F4</kbd>: Rotasi instan metode pembayaran (*TUNAI* &rarr; *QRIS* &rarr; *KARTU DEBIT* &rarr; *TRANSFER*).
 - <kbd>F8</kbd>: Isi otomatis uang pas (*Exact Cash Amount*).
 - <kbd>F9</kbd>: Tampilkan pratinjau struk thermal 58mm/80mm siap cetak.
 - <kbd>ESC</kbd>: Menutup jendela modal aktif secara instan.
 
-### D. Dynamic QRIS Modal & Web Audio Synthesizer
+### G. Dynamic QRIS Modal & Web Audio Synthesizer
 - **QRIS Dinamis**: Modal QRIS otomatis dengan *countdown timer* 15 menit dan simulasi verifikasi transfer QRIS 1-klik.
 - **Native Web Audio API Synthesizer**: Efek suara sintetis tanpa aset berkas eksternal mp3:
   - *Barcode Scanner Beep* (880Hz Sine Wave) saat memilih suku cadang HGP.
   - *Success Chime* (Arpeggio nada ganda 523Hz & 659Hz) saat transaksi kasir berhasil diselesaikan.
   - *Click Feedback* (1200Hz) untuk umpan balik respons tombol sentuh.
 
-### E. Pinia Toast Notification System
+### H. Pinia Toast Notification System
 Sistem notifikasi modern *non-blocking* menggantikan fungsi `alert()` bawaan browser, dilengkapi transisi halus, pewarnaan kontekstual (*Success, Error, Info*), dan *auto-dismiss* 4 detik.
 
-### F. Customer Waiting Lounge TV Monitor (`/waiting-display`)
+### I. Customer Waiting Lounge TV Monitor (`/waiting-display`)
 - **Fullscreen Kiosk Mode 16:9**: Tampilan layar lebar khusus TV monitor ruang tunggu pelanggan AHASS.
 - **Live Status Polling**: Pembaruan status otomatis setiap 5 detik memantau antrean motor di Pit 1 s/d Pit 4.
 - **Marquee Running Ticker**: Teks berjalan di bagian bawah mengedukasi pelanggan mengenai keaslian oli Honda AHM Oil, garansi servis 500 KM, dan tips keselamatan berkendara *#Cari_Aman*.

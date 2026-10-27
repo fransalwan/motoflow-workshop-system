@@ -178,7 +178,7 @@
         <h3 class="font-bold text-slate-800 text-base mb-1">Tren Pendapatan & Kunjungan 7 Hari Terakhir</h3>
         <p class="text-xs text-slate-500 mb-6">Monitoring performa harian operasional AHASS NSS</p>
 
-        <div class="grid grid-cols-7 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           <div 
             v-for="d in dashboardStore.summary.daily_trend" 
             :key="d.date"

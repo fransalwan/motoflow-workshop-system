@@ -1,18 +1,19 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200">
+  <div v-if="isOpen" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 max-h-[92vh] flex flex-col">
+      <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto my-2 sm:hidden"></div>
       <!-- Modal Top Bar -->
-      <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+      <div class="bg-slate-900 text-white px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <FileText class="w-5 h-5 text-red-500" />
-          <h3 class="font-bold text-lg">Faktur Resmi Servis & Suku Cadang AHASS (A4)</h3>
+          <h3 class="font-bold text-sm sm:text-lg">Faktur Resmi Servis & Suku Cadang (A4)</h3>
         </div>
-        <div class="flex items-center space-x-3">
+        <div class="flex items-center space-x-2 sm:space-x-3">
           <button 
             @click="downloadPDF"
-            class="inline-flex items-center space-x-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg shadow transition">
-            <Download class="w-4 h-4" />
-            <span>Unduh PDF Resmi</span>
+            class="inline-flex items-center space-x-1 sm:space-x-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-2.5 sm:px-3.5 py-1.5 rounded-lg shadow-xs transition active:scale-95">
+            <Download class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span class="hidden xs:inline">Unduh PDF</span>
           </button>
           <button @click="$emit('close')" class="text-slate-400 hover:text-white transition">
             <X class="w-5 h-5" />
@@ -20,9 +21,9 @@
         </div>
       </div>
 
-      <!-- A4 Sheet Paper Preview -->
-      <div class="p-8 bg-slate-100 max-h-[75vh] overflow-y-auto flex justify-center">
-        <div class="bg-white w-[210mm] min-h-[260mm] p-8 shadow-xl border border-slate-200 rounded-sm text-slate-900 flex flex-col justify-between">
+      <!-- A4 Sheet Paper Preview (Horizontally scrollable on mobile) -->
+      <div class="p-2 sm:p-8 bg-slate-100 max-h-[75vh] overflow-x-auto overflow-y-auto flex justify-start sm:justify-center">
+        <div class="bg-white w-[210mm] min-w-[700px] min-h-[260mm] p-6 sm:p-8 shadow-xl border border-slate-200 rounded-sm text-slate-900 flex flex-col justify-between">
           <div>
             <!-- AHASS Official Red Header Bar -->
             <div class="bg-red-700 text-white text-center py-2 px-4 rounded font-bold text-xs tracking-wider uppercase mb-6">

@@ -29,10 +29,38 @@
       </div>
     </div>
 
+    <!-- Mobile Segmented Tab Switcher (Visible on < lg) -->
+    <div class="lg:hidden flex bg-slate-200/80 p-1 rounded-2xl text-xs font-bold">
+      <button
+        @click="mobileTab = 'catalog'"
+        :class="mobileTab === 'catalog' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'"
+        class="flex-1 py-2.5 rounded-xl transition flex items-center justify-center space-x-1.5"
+      >
+        <ShoppingBag class="w-4 h-4" />
+        <span>Katalog Part</span>
+      </button>
+      <button
+        @click="mobileTab = 'cart'"
+        :class="mobileTab === 'cart' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'"
+        class="flex-1 py-2.5 rounded-xl transition flex items-center justify-center space-x-1.5 relative"
+      >
+        <ShoppingCart class="w-4 h-4" />
+        <span>Keranjang</span>
+        <span
+          v-if="retailStore.cartTotalItems > 0"
+          class="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-mono font-black"
+        >
+          {{ retailStore.cartTotalItems }}
+        </span>
+      </button>
+    </div>
+
     <!-- Main Layout: 2 Columns (Catalog Left, Cart Right) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       <!-- Left: Products Catalog (7 cols on lg) -->
-      <div class="lg:col-span-7 space-y-4">
+      <div 
+        :class="mobileTab === 'catalog' ? 'block' : 'hidden lg:block'"
+        class="lg:col-span-7 space-y-4">
         <!-- Search & Filter Controls -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
           <div class="relative">
@@ -114,8 +142,10 @@
       </div>
 
       <!-- Right: Sticky Cart & Checkout Panel (5 cols on lg) -->
-      <div class="lg:col-span-5 space-y-4">
-        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-md p-5 flex flex-col justify-between min-h-[580px]">
+      <div 
+        :class="mobileTab === 'cart' ? 'block' : 'hidden lg:block'"
+        class="lg:col-span-5 space-y-4">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-md p-4 sm:p-5 flex flex-col justify-between min-h-[580px]">
           <!-- Cart Header -->
           <div>
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -126,13 +156,22 @@
                   {{ retailStore.cartTotalItems }} item
                 </span>
               </div>
-              <button
-                v-if="retailStore.cart.length > 0"
-                @click="retailStore.clearCart"
-                class="text-[11px] font-semibold text-slate-400 hover:text-red-600"
-              >
-                Kosongkan
-              </button>
+              <div class="flex items-center space-x-2">
+                <button
+                  v-if="mobileTab === 'cart'"
+                  @click="mobileTab = 'catalog'"
+                  class="lg:hidden text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg hover:bg-slate-200"
+                >
+                  + Tambah Part
+                </button>
+                <button
+                  v-if="retailStore.cart.length > 0"
+                  @click="retailStore.clearCart"
+                  class="text-[11px] font-semibold text-slate-400 hover:text-red-600"
+                >
+                  Kosongkan
+                </button>
+              </div>
             </div>
 
             <!-- Customer Identity -->
@@ -179,26 +218,26 @@
                   </span>
                 </div>
 
-                <!-- Qty Stepper -->
+                <!-- Qty Stepper (Touch-Friendly Min 36px) -->
                 <div class="flex items-center space-x-1.5">
                   <button
                     @click="retailStore.updateQty(item.sparepart.id, item.quantity - 1)"
-                    class="w-6 h-6 rounded-md bg-white border border-slate-200 text-slate-700 flex items-center justify-center font-bold hover:bg-slate-100"
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm hover:bg-slate-100 active:scale-95 shadow-xs transition"
                   >
                     -
                   </button>
                   <span class="font-mono font-bold text-xs w-6 text-center">{{ item.quantity }}</span>
                   <button
                     @click="retailStore.updateQty(item.sparepart.id, item.quantity + 1)"
-                    class="w-6 h-6 rounded-md bg-white border border-slate-200 text-slate-700 flex items-center justify-center font-bold hover:bg-slate-100"
+                    class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center justify-center font-bold text-sm hover:bg-slate-100 active:scale-95 shadow-xs transition"
                   >
                     +
                   </button>
                   <button
                     @click="retailStore.removeFromCart(item.sparepart.id)"
-                    class="text-slate-400 hover:text-red-600 ml-1"
+                    class="p-1.5 text-slate-400 hover:text-red-600 ml-1 active:scale-90 transition"
                   >
-                    <Trash2 class="w-3.5 h-3.5" />
+                    <Trash2 class="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -345,9 +384,33 @@
       </div>
     </div>
 
+    <!-- Floating Sticky Cart Bar (Mobile Only: Visible when on Catalog tab and Cart has items) -->
+    <div
+      v-if="mobileTab === 'catalog' && retailStore.cartTotalItems > 0"
+      class="lg:hidden fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-3 right-3 z-30 bg-slate-900/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-2xl flex items-center justify-between border border-slate-800 animate-in slide-in-from-bottom duration-200"
+    >
+      <div class="flex items-center space-x-2.5">
+        <div class="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold text-xs shadow-md">
+          {{ retailStore.cartTotalItems }}
+        </div>
+        <div>
+          <span class="text-[10px] text-slate-400 block font-medium">Total Tagihan</span>
+          <span class="text-sm font-black font-mono text-white">{{ formatRupiah(retailStore.cartGrandTotal) }}</span>
+        </div>
+      </div>
+      <button
+        @click="mobileTab = 'cart'"
+        class="bg-red-600 hover:bg-red-500 text-white text-xs font-bold px-4 py-2 rounded-xl flex items-center space-x-1.5 shadow-md active:scale-95 transition"
+      >
+        <span>Lihat Keranjang</span>
+        <ArrowRight class="w-3.5 h-3.5" />
+      </button>
+    </div>
+
     <!-- Modal Thermal Receipt POS 58mm/80mm -->
-    <div v-if="showReceiptModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 space-y-4">
+    <div v-if="showReceiptModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto -mt-2 mb-2 sm:hidden"></div>
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div class="flex items-center space-x-2">
             <Printer class="w-5 h-5 text-red-600" />
@@ -382,8 +445,9 @@
     </div>
 
     <!-- Modal Riwayat Transaksi Retail -->
-    <div v-if="showHistoryModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full p-6 border border-slate-200 space-y-4 max-h-[85vh] flex flex-col">
+    <div v-if="showHistoryModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div class="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-3xl w-full p-6 border border-slate-200 space-y-4 max-h-[90vh] flex flex-col">
+        <div class="w-12 h-1.5 bg-slate-300 rounded-full mx-auto -mt-2 mb-2 sm:hidden"></div>
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
           <div class="flex items-center space-x-2">
             <ReceiptText class="w-5 h-5 text-red-600" />
@@ -452,6 +516,7 @@ import {
   Printer,
   ReceiptText,
   X,
+  ArrowRight,
 } from 'lucide-vue-next'
 import { useRetailStore } from '../stores/retail'
 import { useSparepartStore } from '../stores/sparepart'
@@ -465,6 +530,7 @@ const retailStore = useRetailStore()
 const sparepartStore = useSparepartStore()
 const toast = useToastStore()
 
+const mobileTab = ref<'catalog' | 'cart'>('catalog')
 const searchQuery = ref('')
 const selectedCategory = ref('Semua')
 const customerName = ref('Konsumen Walk-in')
