@@ -178,7 +178,7 @@ func (ctrl *ShowroomController) GetSPKList(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": list})
 }
 
-// GetSPKReceipt mengembalikan teks konfirmasi pesanan SPK
+// GetSPKReceipt mengembalikan teks konfirmasi pesanan SPK dengan format 48-char (80mm) presisi
 func (ctrl *ShowroomController) GetSPKReceipt(c *gin.Context) {
 	id := c.Param("id")
 	var spk models.SPKUnit
@@ -188,29 +188,58 @@ func (ctrl *ShowroomController) GetSPKReceipt(c *gin.Context) {
 		return
 	}
 
+	lineLength := 48
+	center := func(s string) string {
+		if len(s) >= lineLength {
+			return s[:lineLength] + "\n"
+		}
+		spaces := (lineLength - len(s)) / 2
+		return strings.Repeat(" ", spaces) + s + "\n"
+	}
+
+	row := func(left, right string) string {
+		maxLeft := lineLength - len(right) - 1
+		if maxLeft < 0 {
+			maxLeft = 0
+		}
+		if len(left) > maxLeft {
+			left = left[:maxLeft]
+		}
+		spacing := lineLength - len(left) - len(right)
+		if spacing < 1 {
+			spacing = 1
+		}
+		return left + strings.Repeat(" ", spacing) + right + "\n"
+	}
+
+	separator := strings.Repeat("-", lineLength) + "\n"
+	doubleSeparator := strings.Repeat("=", lineLength) + "\n"
+
 	var sb strings.Builder
-	sb.WriteString("====================================================\n")
-	sb.WriteString("             PT NUSANTARA SAKTI GROUP\n")
-	sb.WriteString("        DEALER RESMI SEPEDA MOTOR HONDA\n")
-	sb.WriteString("        SURAT PEMESANAN KENDARAAN (SPK)\n")
-	sb.WriteString("====================================================\n")
-	sb.WriteString(fmt.Sprintf("No. SPK        : %s\n", spk.SPKNumber))
-	sb.WriteString(fmt.Sprintf("Tanggal        : %s\n", spk.CreatedAt.Format("02/01/2006 15:04")))
+	sb.WriteString(doubleSeparator)
+	sb.WriteString(center("PT NUSANTARA SAKTI GROUP"))
+	sb.WriteString(center("DEALER RESMI SEPEDA MOTOR HONDA"))
+	sb.WriteString(center("SURAT PEMESANAN KENDARAAN (SPK)"))
+	sb.WriteString(doubleSeparator)
+	sb.WriteString(row("No. SPK:", spk.SPKNumber))
+	sb.WriteString(row("Tanggal:", spk.CreatedAt.Format("02/01/2006 15:04")))
 	salesName := "Sales Counter NSS"
 	if spk.Sales != nil {
 		salesName = spk.Sales.FullName
 	}
-	sb.WriteString(fmt.Sprintf("Sales Counter  : %s\n", salesName))
-	sb.WriteString("----------------------------------------------------\n")
+	sb.WriteString(row("Sales Counter:", salesName))
+	sb.WriteString(separator)
+
 	customerName := "-"
 	customerPhone := "-"
 	if spk.Customer != nil {
 		customerName = spk.Customer.Name
 		customerPhone = spk.Customer.Phone
 	}
-	sb.WriteString(fmt.Sprintf("Nama Pemesan   : %s\n", customerName))
-	sb.WriteString(fmt.Sprintf("No. HP / WA    : %s\n", customerPhone))
-	sb.WriteString("----------------------------------------------------\n")
+	sb.WriteString(row("Nama Pemesan:", customerName))
+	sb.WriteString(row("No. HP / WA:", customerPhone))
+	sb.WriteString(separator)
+
 	unitName := "-"
 	color := "-"
 	frameNo := "-"
@@ -221,32 +250,34 @@ func (ctrl *ShowroomController) GetSPKReceipt(c *gin.Context) {
 		frameNo = spk.MotorUnit.FrameNumber
 		engineNo = spk.MotorUnit.EngineNumber
 	}
-	sb.WriteString(fmt.Sprintf("Tipe Motor     : %s\n", unitName))
-	sb.WriteString(fmt.Sprintf("Warna          : %s\n", color))
-	sb.WriteString(fmt.Sprintf("Nomor Rangka   : %s\n", frameNo))
-	sb.WriteString(fmt.Sprintf("Nomor Mesin    : %s\n", engineNo))
-	sb.WriteString("----------------------------------------------------\n")
-	sb.WriteString(fmt.Sprintf("Skema Pembelian: %s\n", strings.ToUpper(spk.PurchaseType)))
+	sb.WriteString(row("Tipe Motor:", unitName))
+	sb.WriteString(row("Warna:", color))
+	sb.WriteString(row("No. Rangka:", frameNo))
+	sb.WriteString(row("No. Mesin:", engineNo))
+	sb.WriteString(separator)
+
+	sb.WriteString(row("Skema Beli:", strings.ToUpper(spk.PurchaseType)))
 	if spk.PurchaseType == "credit_nsc" {
-		sb.WriteString(fmt.Sprintf("Lembaga Leasing: PT NUSA SURYA CIPTADANA (NSC FINANCE)\n"))
-		sb.WriteString(fmt.Sprintf("Uang Muka (DP) : %s\n", formatRupiah(spk.DownPayment)))
-		sb.WriteString(fmt.Sprintf("Tenor Cicilan  : %d Bulan\n", spk.TenorMonths))
-		sb.WriteString(fmt.Sprintf("Angsuran/Bulan : %s / bulan\n", formatRupiah(spk.MonthlyInstallment)))
-		sb.WriteString(fmt.Sprintf("Status Leasing : %s\n", strings.ToUpper(spk.LeasingStatus)))
+		sb.WriteString(row("Lembaga:", "NSC FINANCE"))
+		sb.WriteString(row("Uang Muka (DP):", "Rp "+spk.DownPayment.StringFixed(0)))
+		sb.WriteString(row("Tenor Cicilan:", fmt.Sprintf("%d Bulan", spk.TenorMonths)))
+		sb.WriteString(row("Angsuran/Bln:", "Rp "+spk.MonthlyInstallment.StringFixed(0)))
+		sb.WriteString(row("Status Leasing:", strings.ToUpper(spk.LeasingStatus)))
 	} else {
-		sb.WriteString(fmt.Sprintf("Tanda Jadi (BF): %s\n", formatRupiah(spk.BookingFee)))
+		sb.WriteString(row("Tanda Jadi (BF):", "Rp "+spk.BookingFee.StringFixed(0)))
 	}
-	sb.WriteString("====================================================\n")
-	sb.WriteString("  * SYARAT & KETENTUAN PENGURUSAN STNK/BPKB AHM *\n")
-	sb.WriteString(" 1. Estimasi STNK & Plat Nomor: 14 hari kerja\n")
-	sb.WriteString(" 2. Estimasi BPKB: 60-90 hari kerja via Samsat\n")
-	sb.WriteString("        Salam Satu HATI - Honda Juara!\n")
-	sb.WriteString("====================================================\n")
+	sb.WriteString(doubleSeparator)
+	sb.WriteString(center("* KETENTUAN PENGURUSAN STNK/BPKB AHM *"))
+	sb.WriteString(center("1. Estimasi STNK & Plat: 14 hari kerja"))
+	sb.WriteString(center("2. Estimasi BPKB: 60-90 hari kerja"))
+	sb.WriteString(center("Salam Satu HATI - PT NUSANTARA SAKTI"))
+	sb.WriteString(doubleSeparator)
+	sb.WriteString("\n")
 
 	c.JSON(http.StatusOK, gin.H{
-		"success": true,
+		"success":      true,
 		"receipt_text": sb.String(),
-		"spk": spk,
+		"spk":          spk,
 	})
 }
 

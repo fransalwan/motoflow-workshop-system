@@ -394,7 +394,7 @@ func TestEndToEndAHASSSystem(t *testing.T) {
 		if wRcpt.Code != http.StatusOK {
 			t.Errorf("Failed to get retail receipt: code %d", wRcpt.Code)
 		}
-		if !strings.Contains(wRcpt.Body.String(), "COUNTER PENJUALAN SUKU CADANG RESMI") {
+		if !strings.Contains(wRcpt.Body.String(), "COUNTER RETAIL HGP RESMI") {
 			t.Errorf("Missing retail header in receipt: %s", wRcpt.Body.String())
 		}
 	})

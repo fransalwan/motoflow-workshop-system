@@ -1,30 +1,54 @@
-# Binaries & SQLite
+# Compiled binaries & executables
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+bin/
+motoflow-backend/motoflow-server
+motoflow-backend/main
+
+# Go test & coverage artifacts
+*.out
+*.test
+coverage.txt
+profile.pprof
+
+# Database files & journals
 *.db
 *.db-journal
+*.sqlite
+*.sqlite3
 motoflow-backend/motoflow.db
 motoflow-backend/motoflow.db-journal
 
-# Node
+# Node.js & Frontend build outputs
 node_modules/
 dist/
+motoflow-frontend/dist/
 .vite/
+motoflow-frontend/.vite/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# TypeScript Build Info & Generated Config Artifacts
+# TypeScript build info & generated configs
 *.tsbuildinfo
 motoflow-frontend/vite.config.d.ts
 motoflow-frontend/vite.config.js
 
-# Environment & IDE
+# Environment variables & secrets
 .env
+.env.local
+.env.*.local
+
+# IDE, OS & Editor temporary files
 .DS_Store
+Thumbs.db
+Desktop.ini
 .idea/
 .vscode/
 *.swp
+*.swo
+*~

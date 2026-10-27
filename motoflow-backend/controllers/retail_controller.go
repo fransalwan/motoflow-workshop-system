@@ -221,57 +221,96 @@ func (ctrl *RetailController) GetByID(c *gin.Context) {
 // GetThermalReceipt menghasilkan struk kasir thermal 58mm/80mm ESC/POS text untuk retail OTC
 func (ctrl *RetailController) GetThermalReceipt(c *gin.Context) {
 	id := c.Param("id")
-	var sale models.RetailSale
+	widthStr := c.DefaultQuery("width", "58")
+	width := 58
+	if widthStr == "80" {
+		width = 80
+	}
 
+	var sale models.RetailSale
 	if err := ctrl.db.Preload("Items").Preload("Cashier").First(&sale, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Transaksi tidak ditemukan"})
 		return
 	}
 
+	lineLength := 32 // 58mm standard width
+	if width == 80 {
+		lineLength = 48
+	}
+
+	center := func(s string) string {
+		if len(s) >= lineLength {
+			return s[:lineLength] + "\n"
+		}
+		spaces := (lineLength - len(s)) / 2
+		return strings.Repeat(" ", spaces) + s + "\n"
+	}
+
+	row := func(left, right string) string {
+		maxLeft := lineLength - len(right) - 1
+		if maxLeft < 0 {
+			maxLeft = 0
+		}
+		if len(left) > maxLeft {
+			left = left[:maxLeft]
+		}
+		spacing := lineLength - len(left) - len(right)
+		if spacing < 1 {
+			spacing = 1
+		}
+		return left + strings.Repeat(" ", spacing) + right + "\n"
+	}
+
+	separator := strings.Repeat("-", lineLength) + "\n"
+	doubleSeparator := strings.Repeat("=", lineLength) + "\n"
+
 	var sb strings.Builder
-	sb.WriteString("========================================\n")
-	sb.WriteString("       AHASS NUSANTARA SAKTI MOTOR\n")
-	sb.WriteString("     COUNTER PENJUALAN SUKU CADANG RESMI\n")
-	sb.WriteString("       Telp: (021) 7345-6789 / 0812-3456\n")
-	sb.WriteString("========================================\n")
-	sb.WriteString(fmt.Sprintf("No. Faktur : %s\n", sale.InvoiceNumber))
-	sb.WriteString(fmt.Sprintf("Tanggal    : %s\n", sale.CreatedAt.Format("02/01/2006 15:04")))
+	sb.WriteString(doubleSeparator)
+	sb.WriteString(center("AHASS NUSANTARA SAKTI"))
+	sb.WriteString(center("COUNTER RETAIL HGP RESMI"))
+	sb.WriteString(center("Jl. Cempaka Putih Raya No. 128"))
+	sb.WriteString(center("Telp: (021) 420-5678"))
+	sb.WriteString(doubleSeparator)
+
+	sb.WriteString(row("No. Faktur:", sale.InvoiceNumber))
+	sb.WriteString(row("Tanggal:", sale.CreatedAt.Format("02/01/2006 15:04")))
 	cashierName := "Kasir AHASS"
 	if sale.Cashier != nil {
 		cashierName = sale.Cashier.FullName
 	}
-	sb.WriteString(fmt.Sprintf("Kasir      : %s\n", cashierName))
-	sb.WriteString(fmt.Sprintf("Pelanggan  : %s\n", sale.CustomerName))
-	sb.WriteString("----------------------------------------\n")
-	sb.WriteString(fmt.Sprintf("%-20s %3s %14s\n", "ITEM SUKU CADANG", "QTY", "SUBTOTAL"))
-	sb.WriteString("----------------------------------------\n")
+	sb.WriteString(row("Kasir:", cashierName))
+	sb.WriteString(row("Pelanggan:", sale.CustomerName))
+	sb.WriteString(separator)
+
+	sb.WriteString(row("ITEM SUKU CADANG", "SUBTOTAL"))
+	sb.WriteString(separator)
 
 	for _, it := range sale.Items {
 		name := it.PartNameSnapshot
-		if len(name) > 20 {
-			name = name[:20]
-		}
-		sb.WriteString(fmt.Sprintf("%-20s %3d %14s\n", name, it.Quantity, formatRupiah(it.Subtotal)))
+		sb.WriteString(name + "\n")
+		qtyPrice := fmt.Sprintf(" %dx Rp %s", it.Quantity, it.PriceSnapshot.StringFixed(0))
+		sub := "Rp " + it.Subtotal.StringFixed(0)
+		sb.WriteString(row(qtyPrice, sub))
 	}
 
-	sb.WriteString("----------------------------------------\n")
-	sb.WriteString(fmt.Sprintf("%-24s : %14s\n", "Subtotal Part", formatRupiah(sale.Subtotal)))
+	sb.WriteString(separator)
+	sb.WriteString(row("Subtotal Part:", "Rp "+sale.Subtotal.StringFixed(0)))
 	if sale.DiscountAmount.GreaterThan(decimal.Zero) {
-		sb.WriteString(fmt.Sprintf("%-24s : %14s\n", "Potongan Diskon/Promo", "-"+formatRupiah(sale.DiscountAmount)))
+		sb.WriteString(row("Diskon Promo:", "-Rp "+sale.DiscountAmount.StringFixed(0)))
 	}
-	sb.WriteString(fmt.Sprintf("%-24s : %14s\n", "PPN (11%)", formatRupiah(sale.TaxPPN)))
-	sb.WriteString("========================================\n")
-	sb.WriteString(fmt.Sprintf("%-24s : %14s\n", "TOTAL BAYAR", formatRupiah(sale.GrandTotal)))
-	sb.WriteString(fmt.Sprintf("%-24s : %14s\n", "Metode Pembayaran", strings.ToUpper(string(sale.PaymentMethod))))
-	sb.WriteString(fmt.Sprintf("%-24s : %14s\n", "Jumlah Diterima", formatRupiah(sale.PaidAmount)))
-	sb.WriteString(fmt.Sprintf("%-24s : %14s\n", "Kembalian", formatRupiah(sale.ChangeAmount)))
-	sb.WriteString("========================================\n")
-	sb.WriteString("  * JAMINAN 100% HONDA GENUINE PARTS *\n")
-	sb.WriteString("  Barang yang sudah dibeli tidak dapat\n")
-	sb.WriteString(" ditukar kecuali ada cacat pabrikan AHM\n")
-	sb.WriteString("  Terima kasih telah berbelanja di\n")
-	sb.WriteString("       PT NUSANTARA SAKTI GROUP\n")
-	sb.WriteString("========================================\n")
+	sb.WriteString(row("PPN (11%):", "Rp "+sale.TaxPPN.StringFixed(0)))
+	sb.WriteString(doubleSeparator)
+	sb.WriteString(row("TOTAL BAYAR:", "Rp "+sale.GrandTotal.StringFixed(0)))
+	sb.WriteString(row("Metode Bayar:", strings.ToUpper(string(sale.PaymentMethod))))
+	sb.WriteString(row("Diterima:", "Rp "+sale.PaidAmount.StringFixed(0)))
+	sb.WriteString(row("Kembalian:", "Rp "+sale.ChangeAmount.StringFixed(0)))
+	sb.WriteString(doubleSeparator)
+	sb.WriteString(center("100% HONDA GENUINE PARTS"))
+	sb.WriteString(center("Jaminan Kualitas Astra Honda"))
+	sb.WriteString(center("Terima Kasih Atas Kunjungan Anda"))
+	sb.WriteString(center("PT NUSANTARA SAKTI GROUP"))
+	sb.WriteString(doubleSeparator)
+	sb.WriteString("\n")
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,

@@ -55,57 +55,63 @@ export function printThermalReceipt(
         <title>${title}</title>
         <style>
           @page {
-            size: ${widthMm}mm auto;
+            size: ${widthMm === 58 ? '58mm auto' : '80mm auto'};
             margin: 0;
           }
           * {
             box-sizing: border-box;
           }
           html, body {
-            width: ${widthMm}mm;
             margin: 0;
-            padding: 3mm 3mm 8mm 3mm;
+            padding: 4mm 2mm 8mm 2mm;
             background: #ffffff;
             color: #000000;
-            font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
-            font-size: ${widthMm === 58 ? '10px' : '11px'};
-            line-height: 1.35;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: ${widthMm === 58 ? '9.5pt' : '10pt'};
+            line-height: 1.25;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+          }
+          .receipt-container {
+            display: table;
+            margin: 0 auto;
+            text-align: left;
           }
           pre {
             margin: 0;
             padding: 0;
-            white-space: pre-wrap;
-            word-break: break-all;
+            white-space: pre;
+            word-break: normal;
             font-family: inherit;
           }
           .barcode-area {
-            margin-top: 8px;
+            margin-top: 10px;
             padding-top: 6px;
             border-top: 1px dashed #444;
             text-align: center;
           }
           .barcode-bars {
-            height: 26px;
+            height: 28px;
             display: inline-block;
-            width: ${widthMm === 58 ? '150px' : '220px'};
+            width: ${widthMm === 58 ? '160px' : '220px'};
             background-image: linear-gradient(90deg, #000 50%, transparent 50%);
             background-size: 4px 100%;
             background-repeat: repeat-x;
           }
           .barcode-text {
-            font-size: 9px;
+            font-size: 9pt;
             letter-spacing: 2px;
-            margin-top: 2px;
+            margin-top: 3px;
             font-weight: bold;
             color: #111;
           }
         </style>
       </head>
       <body>
-        <pre>${escapeHtml(receiptText)}</pre>
-        ${barcodeHtml}
+        <div class="receipt-container">
+          <pre>${escapeHtml(receiptText)}</pre>
+          ${barcodeHtml}
+        </div>
       </body>
     </html>
   `

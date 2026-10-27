@@ -29,6 +29,8 @@
 | 📺 **TV Waiting Lounge Monitor** | [`/waiting-display`](https://online-thousands-tutorial-king.trycloudflare.com/waiting-display) | Tampilan TV Kiosk 16:9 fullscreen, auto-polling 5s status Pit 1-4 & Marquee |
 | 📦 **Katalog Honda Genuine Parts** | [`/inventory`](https://online-thousands-tutorial-king.trycloudflare.com/inventory) | Penyesuaian stok HGP, filter oli MPX/SPX, kampas rem, busi, dan v-belt |
 | 👥 **Direktori Pelanggan & Motor** | [`/customers`](https://online-thousands-tutorial-king.trycloudflare.com/customers) | Master no. plat polisi, model motor Honda (Beat, Vario, PCX), riwayat KM |
+| 📄 **Contoh Faktur Resmi A4 (PDF)** | [`docs/Faktur-Resmi-AHASS-Demo.pdf`](docs/Faktur-Resmi-AHASS-Demo.pdf) | Berkas PDF binary hasil kompilasi GoFPDF bengkel resmi AHASS NSS |
+| 📄 **Contoh Dokumen SPK Showroom (PDF)** | [`docs/SPK-Resmi-Showroom-Demo.pdf`](docs/SPK-Resmi-Showroom-Demo.pdf) | Dokumen resmi SPK dealer Honda & pembiayaan kredit 35 bulan NSC Finance |
 
 ---
 
@@ -72,27 +74,42 @@ Proyek **motoflow-workshop-system** dirancang secara khusus untuk membuktikan ke
 
 ```
 motoflow-workshop-system/
+├── .agents/                           # Rule & Workflow Otomasi Agen AI (Antigravity/Cursor)
+│   ├── rules/                         # Definisi Aturan Bisnis & Prinsip Arsitektur
+│   │   ├── scrapflow-core.md          # Adaptasi Logika Inti ScrapFlow ke AHASS
+│   │   └── motoflow-core.md           # Standar Finansial, RBAC, & Integritas Data AHASS
+│   └── workflows/                     # Alur Prosedur Kerja Step-by-Step
+│       ├── mulai-task.md              # SOP Memulai Task Pengembangan Baru
+│       └── pahami-project.md          # Ringkasan Onboarding & Peta Domain Proyek
+│
+├── .github/                           # CI/CD Workflows
+│   └── workflows/
+│       └── ci.yml                     # Pipeline Otomatis: Go Test, Vet, Build & Vue TSC
+│
 ├── motoflow-backend/                  # RESTful API Service (Golang)
 │   ├── config/                        # Koneksi Database (PostgreSQL & SQLite Fallback)
-│   ├── controllers/                   # Handler HTTP (Auth, WO, Sparepart, Dashboard, Print)
+│   ├── controllers/                   # Handler HTTP (Auth, WO, POS Retail, Showroom, Dashboard)
 │   ├── dto/                           # Request & Response Payload Validation
 │   ├── middleware/                    # Autentikasi JWT, Role Permission & CORS
-│   ├── models/                        # Entitas GORM (User, Customer, Sparepart, WorkOrder, dll)
+│   ├── models/                        # Entitas GORM (User, Customer, Sparepart, WorkOrder, SPK, dll)
 │   ├── routes/                        # Registrasi Route Terpusat Gin
-│   ├── seeders/                       # Data Seed Realistis Motor Honda & Suku Cadang HGP
+│   ├── scripts/                       # Utilitas & Standalone Generators
+│   │   └── generate_demo_pdfs.go      # Script Kompilasi Berkas Demo PDF Formal (GoFPDF)
+│   ├── seeders/                       # Data Seed Realistis Motor Honda, Sparepart HGP, & Unit
 │   ├── services/                      # Logika Finansial (Decimal) & Table-Driven Unit Tests
-│   ├── docker-compose.yml             # Container PostgreSQL Lokal
-│   └── main.go                        # Entry Point Server
+│   ├── docker-compose.yml             # Container PostgreSQL & Redis Lokal
+│   ├── e2e_test.go                    # Pengujian Menyeluruh End-to-End Seluruh Alur Bisnis
+│   └── main.go                        # Entry Point Server API
 │
 ├── motoflow-frontend/                 # Web SPA (Vue 3 + Vite + TypeScript)
 │   ├── src/
-│   │   ├── components/                # ThermalReceiptModal, A4InvoiceModal, Sidebar, Navbar
-│   │   ├── layouts/                   # MainLayout Navigasi Responsif
-│   │   ├── pages/                     # Dashboard, WorkOrderList, CreateWO, POS Billing, Inventory
-│   │   ├── router/                    # Guard Autentikasi & Rute Halaman
-│   │   ├── stores/                    # Pinia Store (Auth, WorkOrder, Sparepart, Customer)
+│   │   ├── components/                # ThermalReceiptModal, A4InvoiceModal, QRISModal, Toast
+│   │   ├── layouts/                   # MainLayout Navigasi Responsif Desktop & Mobile
+│   │   ├── pages/                     # Dashboard, WorkOrders, PosRetail, Showroom, Inventory
+│   │   ├── router/                    # Navigation Guard Autentikasi & Rute RBAC Terisolasi
+│   │   ├── stores/                    # Pinia Store (Auth, WorkOrder, Sparepart, Retail, Customer)
 │   │   ├── types/                     # Interface TypeScript
-│   │   └── utils/                     # Formatter Mata Uang Rupiah & Status Badge
+│   │   └── utils/                     # Formatter Mata Uang, Status Badge, Printer, & Sound Synth
 │   ├── package.json
 │   └── vite.config.ts
 │
@@ -101,7 +118,11 @@ motoflow-workshop-system/
 │   ├── business-architecture.md       # Spesifikasi Domain, Formula Finansial & Leasing NSC
 │   ├── database-schema.sql            # Skema Relasi DDL, Foreign Key, & Index PostgreSQL
 │   ├── reporting-queries.sql          # Showcase Query SQL: JOIN, GROUP BY, SUM, COUNT, AVG
-│   └── system-flowchart.md            # Diagram Alur Bisnis Servis AHASS (Mermaid)
+│   ├── system-flowchart.md            # Diagram Alur Bisnis Servis AHASS (Mermaid)
+│   ├── Faktur-Resmi-AHASS-Demo.pdf    # Dokumen Demo: Faktur Resmi Servis AHASS NSS (A4 PDF)
+│   └── SPK-Resmi-Showroom-Demo.pdf    # Dokumen Demo: Surat Pemesanan Kendaraan & NSC Finance (PDF)
+│
+├── .gitignore                         # Konfigurasi Git Ignore Komprehensif (Binaries, Node, DB)
 └── README.md                          # Dokumentasi Utama
 ```
 
@@ -175,50 +196,51 @@ Tersedia tombol login demo otomatis pada halaman `/login`:
 
 ### B. Kasir POS Billing & Engine Cetak Ganda Terisolasi (Isolated Print Engine)
 - **Pencegahan Floating-Point Drift**: Nilai moneter dikalkulasi menggunakan `shopspring/decimal` tanpa galat pembulatan IEEE-754.
-- **Engine Cetak Thermal ESC/POS (`src/utils/printer.ts`)**:
-  - Menggunakan teknik injeksi iframe terisolasi (`@page { size: 58mm auto; margin: 0; }` / `80mm`) yang memblokir header/footer bawaan browser (*URL & Page numbers*).
-  - Merender grafis simulasi *barcode* horizontal dan teks struk monospaced kontras tinggi.
-  - Bebas dari *popup blocker* yang biasa merusak fungsi `window.open` pada browser modern.
+- **Engine Cetak Thermal ESC/POS Presisi Karakter (`src/utils/printer.ts` & Backend)**:
+  - **Dynamic Character Budgeting**: Lebar kertas thermal 58mm dibatasi presisi **32 karakter per baris**, sedangkan kertas 80mm menggunakan **48 karakter per baris**.
+  - **Pencegahan Awkward Mid-Word Wrap**: Mencegah pemotongan kata di tengah kalimat (seperti `AHASS NUSANTARA SAKTI MOT\nOR`) dengan aturan CSS ketat `white-space: pre; word-break: normal;` serta helper `center()` dan `row(left, right)` pada backend Go.
+  - **Centering Container di A4**: Saat dicetak menggunakan printer biasa atau disimpan ke PDF peramban, kontainer struk terpusat rapi di tengah halaman (`display: table; margin: 0 auto;`).
+  - **Iframe Terisolasi**: Menggunakan teknik injeksi iframe terisolasi (`@page { size: 58mm auto; margin: 0; }` / `80mm`) yang memblokir header/footer bawaan browser (*URL & Page numbers*) serta bebas dari *popup blocker*.
 - **Cetak Langsung Faktur A4 & Unduh PDF Resmi (GoFPDF)**:
-  - Tombol **Cetak A4 Langsung**: Merender lembar faktur resmi tanda tangan ganda dengan margin presisi A4 portrait tanpa elemen backdrop modal.
-  - Tombol **Unduh PDF Resmi**: Berkas PDF binary formal berstandar A4 yang dihasilkan langsung dari backend Go via library `jung-kurt/gofpdf`.
+  - **Cetak A4 Langsung**: Merender lembar faktur resmi tanda tangan ganda dengan margin presisi A4 portrait tanpa elemen backdrop modal.
+  - **Unduh PDF Resmi**: Berkas PDF binary formal berstandar A4 yang dihasilkan langsung dari backend Go via library `jung-kurt/gofpdf`.
+  - **Dokumen Demo Siap Unduh Langsung**:
+    - [docs/Faktur-Resmi-AHASS-Demo.pdf](docs/Faktur-Resmi-AHASS-Demo.pdf): Faktur servis resmi AHASS lengkap dengan logo merah, detail part/jasa, PPN 11%, dan stempel digital.
+    - [docs/SPK-Resmi-Showroom-Demo.pdf](docs/SPK-Resmi-Showroom-Demo.pdf): Surat Pemesanan Kendaraan Honda Showroom dengan skema kredit 35 bulan NSC Multifinance.
 
 ```text
-========================================
-       AHASS NUSANTARA SAKTI MOTOR
-     Jl. Raya Ciledug No. 88, Tangerang
-       Telp: (021) 7345-6789 / 0812-3456
-========================================
-No. WO   : WO-AHASS-20261027-0001
-Tgl/Jam  : 27/10/2026 14:30 WIB
-Kasir    : kasir (Siti Rahma)
-Mekanik  : Agus Setiawan (Pit 1)
-----------------------------------------
-Pelanggan: Budi Santoso
-No. Plat : B 3456 KRF
-Motor    : Honda Vario 160 ABS (12.500 KM)
-----------------------------------------
-RINCIAN SUKU CADANG / JASA    QTY  SUBTOTAL
-----------------------------------------
-AHM Oil MPX2 0.8L (Matik)      1  Rp 56.000
-Busi NGK CPR9EA-9              1  Rp 25.000
-Paket Servis Lengkap Matik     1  Rp 90.000
-----------------------------------------
-Subtotal Part & Jasa           : Rp 171.000
-Diskon                         :       Rp 0
-PPN 11%                        :  Rp 18.810
-========================================
-TOTAL TAGIHAN                  : Rp 189.810
-Metode Bayar                   :      TUNAI
-Diterima                       : Rp 200.000
-Kembalian                      :  Rp 10.190
-========================================
-  * GARANSI SERVIS RESMI AHASS 500 KM *
-  Gunakan selalu Honda Genuine Parts &
-     Oli Standar Pabrikan AHM Oil!
- Terima kasih atas kepercayaan Anda di
-       PT NUSANTARA SAKTI GROUP
-========================================
+================================
+     AHASS NUSANTARA SAKTI      
+    COUNTER RETAIL HGP RESMI    
+ Jl. Cempaka Putih Raya No. 128 
+       Telp: (021) 420-5678     
+================================
+No. Faktur: INV-NSS-20261027-001
+Tanggal:    27/10/2026 14:30    
+Kasir:      Siti Rahma (Kasir)  
+Pelanggan:  Budi Santoso        
+--------------------------------
+ITEM SUKU CADANG        SUBTOTAL
+--------------------------------
+AHM Oil MPX2 0.8L (Matik)       
+  1 x Rp 58.000        Rp 58.000
+Busi NGK CPR9EA-9               
+  2 x Rp 25.000        Rp 50.000
+--------------------------------
+Total Barang:         Rp 108.000
+Diskon Promo (10%):   -Rp 10.800
+PPN 11%:                Rp 10.692
+================================
+TOTAL AKHIR:          Rp 107.892
+Metode Bayar:              TUNAI
+Jumlah Diterima:      Rp 110.000
+Kembalian:               Rp 2.108
+================================
+   * SUKU CADANG ASLI HONDA *   
+ Barang yang dibeli tidak dapat 
+ditukar/dikembalikan tanpa nota.
+ Terima Kasih - Salam Satu HATI 
+================================
 ```
 
 ---
@@ -418,7 +440,62 @@ Untuk mencerminkan secara utuh model bisnis **PT Nusantara Sakti Group (NSS)** s
 
 ---
 
-## 13. Profil Pengembang & Lisensi
+## 13. Engineering Deep-Dive: Analisa Apache Kafka pada Ekosistem Nusantara Sakti Group
+
+Pertanyaan arsitektural penting: **Apakah Apache Kafka cocok diimplementasikan pada proyek MotoFlow ini?**
+
+### A. Kesimpulan Eksekutif (The Verdict)
+- **Untuk Fase Saat Ini (Single-Branch Workshop & POS)**: **TIDAK COCOK / OVERKILL**. Menggunakan Kafka di tahap ini adalah bentuk *over-engineering* yang menambah kompleksitas operasional (JVM, ZooKeeper/KRaft cluster, offset management, network partition handling) tanpa memberi nilai tambah performa yang sepadan dibandingkan PostgreSQL ACID + In-Memory/Redis Caching.
+- **Untuk Skala Enterprise NSS (Ratusan Cabang AHASS & Dealer se-Indonesia)**: **SANGAT COCOK & MENJADI STANDAR INDUSTRI (EVENT-DRIVEN ARCHITECTURE)**.
+
+```mermaid
+flowchart TD
+    subgraph Cabang_NSS["Kantor Cabang / Dealer AHASS NSS (Edge)"]
+        POS["POS Kasir / Bengkel AHASS"] --> DB[("PostgreSQL Cabang")]
+        DB --> Outbox["Transactional Outbox Table"]
+        Outbox --> Debezium["Debezium / CDC Agent"]
+    end
+
+    subgraph Kafka_Cluster["Apache Kafka Enterprise Backbone (Head Office NSS)"]
+        Debezium --> Topic1["Topic: nss.workshop.wo-completed"]
+        Debezium --> Topic2["Topic: nss.showroom.spk-booked"]
+        Debezium --> Topic3["Topic: nss.retail.parts-depleted"]
+    end
+
+    subgraph HO_Consumers["Head Office NSS Consumers"]
+        Topic1 --> ClaimAHM["Klaim Kupon Perawatan Berkala (KPB) Astra Honda Motor"]
+        Topic2 --> NSCLeasing["NSC Multifinance SLIK OJK & Credit Scoring Worker"]
+        Topic3 --> SupplyChain["Procurement & Central Warehouse HGP Auto-Replenish"]
+        Topic1 --> DataLake[("Big Data Lake & BI Executive NSS (ClickHouse/Snowflake)")]
+    end
+```
+
+### B. Kapan Kafka Mutlak Diperlukan di PT Nusantara Sakti Group?
+1. **Asynchronous Credit Approval NSC Multifinance**:
+   - Saat kasir showroom menerbitkan SPK kredit, nasabah harus melalui scoring OJK/SLIK dan verifikasi dokumen pembiayaan. Jika proses ini synchronous via REST HTTP, kasir akan mengalami *timeout* atau *blocking UI*. Dengan Kafka, event `SPKUnitCreated` di-publish ke topic, lalu worker NSC Finance memproses evaluasi kredit secara asinkron tanpa mengganggu kasir.
+2. **Klaim Garansi & Kupon Perawatan Berkala (KPB) ke Astra Honda Motor (AHM)**:
+   - Setiap servis gratis berkala (KPB 1 s/d KPB 4) harus dilaporkan ke server pusat PT Astra Honda Motor untuk pencairan klaim oli dan jasa. Kafka menjamin *at-least-once delivery* dan *fault-tolerance* jika server AHM sedang *down* (event tersimpan rapi di topic hingga consumer siap).
+3. **Sentralisasi Inventaris Suku Cadang (Supply Chain Real-Time Reorder)**:
+   - Suku cadang HGP yang menipis di cabang Padang, Surabaya, atau Cempaka Putih secara otomatis memicu pesan ke topic `nss.retail.parts-depleted` yang langsung diproses oleh sistem pengadaan gudang pusat (Central Parts Distribution Center) untuk pengiriman stok ulang (*auto-replenishment*).
+4. **Audit Trail Finansial & Event Sourcing (OJK & Kemenkeu Compliance)**:
+   - Kafka log bersifat *immutable append-only*, sangat ideal untuk jejak audit transaksi multifinance yang tidak boleh dimanipulasi (*tamper-proof*).
+
+### C. Mengapa Belum Cocok di Tahap Single-Branch (Saat Ini)?
+| Aspek Pertimbangan | PostgreSQL + Redis (MotoFlow Saat Ini) | Apache Kafka Enterprise Cluster |
+| :--- | :--- | :--- |
+| **Konsistensi Transaksi** | **Immediate ACID Consistency** (Kasir tidak boleh *overselling* stok part yang sama pada milidetik yang sama). | **Eventual Consistency** (Perlu penanganan *compensating transaction* / Saga Pattern jika transaksi gagal). |
+| **Beban Infrastruktur** | Ringan (Single process Golang + SQLite / PostgreSQL 100MB RAM). | Berat (Cluster minimum 3 broker KRaft, JVM 4-8 GB RAM, Zookeeper/Storage overhead). |
+| **Kompleksitas Debugging** | Mudah (Stack trace langsung, transaksi DB atomik, query SQL instan). | Tinggi (Tracing event terdistribusi, dead-letter queue, rebalancing, deduplikasi pesan). |
+| **Latency Latensitas** | **< 3ms** untuk checkout kasir lokal. | ~10-50ms roundtrip network hop ke cluster Kafka pusat. |
+
+### D. Rekomendasi Roadmap Arsitektur Bertahap (Engineering Roadmap)
+- **Fase 1 (Implementasi Sekarang)**: Menggunakan **PostgreSQL ACID Transactions** dengan *Pessimistic / Advisory Locking* dan *In-Memory Caching* di level aplikasi. Solusi ini menjamin keakuratan finansial 100% tanpa risiko stok minus.
+- **Fase 2 (Scale-Up Multi-Branch)**: Menerapkan **Transactional Outbox Pattern**. Transaksi kasir disimpan ke tabel PostgreSQL bersamaan dengan tabel `outbox_events`. Worker internal Go membaca tabel outbox secara berkala (*CDC/Polling*) dan mengirimkannya ke cloud.
+- **Fase 3 (Enterprise Scale NSS)**: Menghubungkan outbox worker langsung ke **Apache Kafka Cluster** di Head Office NSS Jakarta untuk mendukung jutaan event per hari dari 90+ dealer dan bengkel AHASS seluruh Indonesia.
+
+---
+
+## 14. Profil Pengembang & Lisensi
 - **Pengembang**: **Frans Alwan** ([@fransalwan](https://github.com/fransalwan))
 - **Email**: fransalwan55@gmail.com
 - **Posisi Tujuan**: **Programmer Junior** — PT Nusantara Sakti Group (NSS)
