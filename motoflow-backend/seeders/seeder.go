@@ -548,7 +548,150 @@ func SeedAll(db *gorm.DB) error {
 	}
 	db.Create(&wo3)
 
-	log.Println("[Seeder] Successfully seeded AHASS users, categories, parts, mechanics, and work orders.")
+	// Seed Retail & Showroom
+	SeedRetailAndShowroom(db)
+
+	log.Println("[Seeder] Successfully seeded AHASS users, categories, parts, mechanics, work orders, showroom units, and retail promos.")
 	return nil
+}
+
+// SeedRetailAndShowroom mengisi data unit motor showroom Honda NSS dan promo retail
+func SeedRetailAndShowroom(db *gorm.DB) {
+	var motorCount int64
+	db.Model(&models.MotorUnit{}).Count(&motorCount)
+	if motorCount == 0 {
+		log.Println("[Seeder] Seeding Honda showroom motor units...")
+		motorUnits := []models.MotorUnit{
+			{
+				ModelName:         "Honda Vario 160 ABS",
+				Category:          "Matic",
+				FrameNumber:       "MH1KF8113PK102941",
+				EngineNumber:      "KF81E1102941",
+				Color:             "Grande Matte Black",
+				Year:              2025,
+				OTRPrice:          decimal.NewFromInt(29500000),
+				MinDP:             decimal.NewFromInt(3000000),
+				Status:            "ready",
+				ImageURL:          "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=600&auto=format&fit=crop&q=60",
+				SpecsSummary:      "160cc 4-Katup eSP+, PGM-FI, Antilock-Braking System (ABS), Honda Smart Key, Full Digital Panelmeter.",
+				WarehouseLocation: "Showroom NSS Ciledug",
+			},
+			{
+				ModelName:         "Honda Beat Deluxe CBS-ISS",
+				Category:          "Matic",
+				FrameNumber:       "MH1JM8112RK234918",
+				EngineNumber:      "JM81E2234918",
+				Color:             "Deluxe Dark Silver",
+				Year:              2025,
+				OTRPrice:          decimal.NewFromInt(18900000),
+				MinDP:             decimal.NewFromInt(1900000),
+				Status:            "ready",
+				ImageURL:          "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=600&auto=format&fit=crop&q=60",
+				SpecsSummary:      "110cc eSP generasi terbaru, Rangka eSAF bergaransi 5 tahun, ISS (Idling Stop System), Power Charger USB.",
+				WarehouseLocation: "Showroom NSS Ciledug",
+			},
+			{
+				ModelName:         "Honda PCX 160 CBS",
+				Category:          "Matic",
+				FrameNumber:       "MH1KF5119PK304912",
+				EngineNumber:      "KF51E1304912",
+				Color:             "Magnificent Red",
+				Year:              2025,
+				OTRPrice:          decimal.NewFromInt(32670000),
+				MinDP:             decimal.NewFromInt(3500000),
+				Status:            "ready",
+				ImageURL:          "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=600&auto=format&fit=crop&q=60",
+				SpecsSummary:      "160cc eSP+ 4 katup, Bagasi lega 30 Liter, HSTC (Honda Selectable Torque Control), Tangki 8.1 Liter.",
+				WarehouseLocation: "Showroom NSS Tangerang",
+			},
+			{
+				ModelName:         "Honda Scoopy Prestige",
+				Category:          "Matic",
+				FrameNumber:       "MH1JM3110RK492019",
+				EngineNumber:      "JM31E2492019",
+				Color:             "Prestige White",
+				Year:              2025,
+				OTRPrice:          decimal.NewFromInt(22780000),
+				MinDP:             decimal.NewFromInt(2300000),
+				Status:            "ready",
+				ImageURL:          "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=600&auto=format&fit=crop&q=60",
+				SpecsSummary:      "Retro Modern 110cc eSP, Smart Key System, LED Projector Headlight, Pelek 12 Inci Trendy.",
+				WarehouseLocation: "Showroom NSS Ciledug",
+			},
+			{
+				ModelName:         "Honda EM1 e: (Motor Listrik EV)",
+				Category:          "EV Listrik",
+				FrameNumber:       "MH1ED0111SK001928",
+				EngineNumber:      "ED01E1001928",
+				Color:             "Innovative White",
+				Year:              2025,
+				OTRPrice:          decimal.NewFromInt(40000000),
+				MinDP:             decimal.NewFromInt(5000000),
+				Status:            "ready",
+				ImageURL:          "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=600&auto=format&fit=crop&q=60",
+				SpecsSummary:      "Motor Listrik Honda Mobile Power Pack e: (Baterai Swap/Charge), Jarak Tempuh 41.1 km, Ramah Lingkungan Zero Emission.",
+				WarehouseLocation: "Showroom NSS Pusat",
+			},
+			{
+				ModelName:         "Honda CBR150R ABS MotoGP Edition",
+				Category:          "Sport",
+				FrameNumber:       "MH1KC9115PK091823",
+				EngineNumber:      "KC91E1091823",
+				Color:             "Victory Red Black",
+				Year:              2025,
+				OTRPrice:          decimal.NewFromInt(41500000),
+				MinDP:             decimal.NewFromInt(4500000),
+				Status:            "ready",
+				ImageURL:          "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=600&auto=format&fit=crop&q=60",
+				SpecsSummary:      "150cc DOHC 4-Katup 6-Kecepatan Berpendingin Cairan, Inverted Front Suspension (Upside Down), Slipper Clutch.",
+				WarehouseLocation: "Showroom NSS Tangerang",
+			},
+		}
+		for _, m := range motorUnits {
+			db.Create(&m)
+		}
+	}
+
+	var promoCount int64
+	db.Model(&models.Promotion{}).Count(&promoCount)
+	if promoCount == 0 {
+		log.Println("[Seeder] Seeding retail promotions and bundling...")
+		validUntil := time.Now().AddDate(1, 0, 0)
+		promos := []models.Promotion{
+			{
+				PromoCode:     "NSSHEMAT10",
+				Title:         "Diskon Retail 10% Part & Oli",
+				Description:   "Potongan langsung 10% untuk pembelian suku cadang Honda Genuine Parts tanpa minimal belanja.",
+				PromoType:     "percentage",
+				DiscountValue: decimal.NewFromInt(10),
+				MinSpend:      decimal.NewFromInt(50000),
+				IsActive:      true,
+				ValidUntil:    validUntil,
+			},
+			{
+				PromoCode:     "TUNEUPMATIC",
+				Title:         "Paket Bundling Ganti Oli & Busi Hemat Rp 15.000",
+				Description:   "Potongan flat Rp 15.000 untuk pembelian paket Oli MPX2 + Busi NGK.",
+				PromoType:     "fixed_nominal",
+				DiscountValue: decimal.NewFromInt(15000),
+				MinSpend:      decimal.NewFromInt(70000),
+				IsActive:      true,
+				ValidUntil:    validUntil,
+			},
+			{
+				PromoCode:     "OLIASLI5K",
+				Title:         "Cashback Oli AHM Oil Rp 5.000",
+				Description:   "Potongan instan Rp 5.000 untuk pembelian AHM Oil varian MPX atau SPX kemasan 0.8L / 1.0L.",
+				PromoType:     "fixed_nominal",
+				DiscountValue: decimal.NewFromInt(5000),
+				MinSpend:      decimal.NewFromInt(50000),
+				IsActive:      true,
+				ValidUntil:    validUntil,
+			},
+		}
+		for _, p := range promos {
+			db.Create(&p)
+		}
+	}
 }
 

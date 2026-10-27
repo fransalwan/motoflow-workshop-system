@@ -58,6 +58,11 @@ func InitDB(cfg *Config) (*gorm.DB, error) {
 		&models.Mechanic{},
 		&models.WorkOrder{},
 		&models.WorkOrderItem{},
+		&models.RetailSale{},
+		&models.RetailSaleItem{},
+		&models.MotorUnit{},
+		&models.SPKUnit{},
+		&models.Promotion{},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to run migrations: %w", err)

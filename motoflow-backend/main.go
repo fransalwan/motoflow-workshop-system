@@ -22,6 +22,7 @@ func main() {
 	if err := seeders.SeedAll(db); err != nil {
 		log.Printf("[MotoFlow WARNING] Seeder encountered issue: %v", err)
 	}
+	seeders.SeedRetailAndShowroom(db)
 
 	r := routes.SetupRouter(db)
 

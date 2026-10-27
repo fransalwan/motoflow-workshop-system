@@ -37,6 +37,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	workOrderCtrl := controllers.NewWorkOrderController(db)
 	dashboardCtrl := controllers.NewDashboardController(db)
 	printCtrl := controllers.NewPrintController(db)
+	retailCtrl := controllers.NewRetailController(db)
+	showroomCtrl := controllers.NewShowroomController(db)
 
 	api := r.Group("/api/v1")
 	{
@@ -102,6 +104,26 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 				// Print Engine (Thermal Receipt & A4 PDF)
 				workOrders.GET("/:id/receipt", printCtrl.ThermalReceipt)
 				workOrders.GET("/:id/invoice-pdf", printCtrl.ServiceInvoicePDF)
+			}
+
+			// Retail Counter OTC (Over-The-Counter Cashier)
+			retail := authRequired.Group("/retail")
+			{
+				retail.POST("/checkout", retailCtrl.Checkout)
+				retail.GET("/sales", retailCtrl.List)
+				retail.GET("/sales/:id", retailCtrl.GetByID)
+				retail.GET("/sales/:id/receipt", retailCtrl.GetThermalReceipt)
+				retail.GET("/promotions", retailCtrl.GetPromotions)
+			}
+
+			// Showroom Honda & NSC Finance
+			showroom := authRequired.Group("/showroom")
+			{
+				showroom.GET("/units", showroomCtrl.GetMotorUnits)
+				showroom.POST("/simulate-credit", showroomCtrl.SimulateCredit)
+				showroom.POST("/spk", showroomCtrl.CreateSPK)
+				showroom.GET("/spk", showroomCtrl.GetSPKList)
+				showroom.GET("/spk/:id/receipt", showroomCtrl.GetSPKReceipt)
 			}
 		}
 	}

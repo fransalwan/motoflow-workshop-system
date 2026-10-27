@@ -40,6 +40,16 @@ const routes = [
         component: () => import('../pages/WorkOrderDetailPage.vue'),
       },
       {
+        path: 'pos-retail',
+        name: 'PosRetail',
+        component: () => import('../pages/PosRetailPage.vue'),
+      },
+      {
+        path: 'showroom',
+        name: 'Showroom',
+        component: () => import('../pages/ShowroomPage.vue'),
+      },
+      {
         path: 'inventory',
         name: 'Inventory',
         component: () => import('../pages/InventoryPage.vue'),

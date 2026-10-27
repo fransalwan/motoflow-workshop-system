@@ -147,6 +147,8 @@ import {
   Tv,
   LogOut,
   X,
+  ShoppingBag,
+  Bike,
 } from 'lucide-vue-next'
 import { useAuthStore } from '../stores/auth'
 
@@ -161,7 +163,9 @@ const authStore = useAuthStore()
 
 const menuItems = [
   { label: 'Executive Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'Work Orders / Kasir', to: '/work-orders', icon: ClipboardList },
+  { label: 'Work Orders Servis', to: '/work-orders', icon: ClipboardList },
+  { label: 'POS Retail Part & Oli', to: '/pos-retail', icon: ShoppingBag },
+  { label: 'Showroom Motor & NSC', to: '/showroom', icon: Bike },
   { label: 'Pendaftaran Servis', to: '/work-orders/create', icon: PlusCircle },
   { label: 'Suku Cadang HGP', to: '/inventory', icon: PackageCheck },
   { label: 'Data Pelanggan & Motor', to: '/customers', icon: Users },

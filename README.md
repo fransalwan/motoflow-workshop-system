@@ -22,6 +22,8 @@
 | Modul Fitur | URL / Rute Demo | Fitur Utama yang Dapat Diuji |
 | :--- | :--- | :--- |
 | 🔐 **Portal Login Demo** | [`/login`](https://online-thousands-tutorial-king.trycloudflare.com/login) | Tombol 1-klik untuk berganti role: `Admin`, `Advisor`, `Kasir`, `Mekanik` |
+| 🛒 **POS Retail Counter OTC** | [`/pos-retail`](https://online-thousands-tutorial-king.trycloudflare.com/pos-retail) | Penjualan langsung Oli/Part tanpa tiket servis, Barcode scan, Promo Bundling, Struk POS |
+| 🏍️ **Showroom Motor & NSC** | [`/showroom`](https://online-thousands-tutorial-king.trycloudflare.com/showroom) | Katalog unit fisik, alokasi VIN/No. Rangka, Kalkulator Simulasi Kredit NSC Finance, Terbit SPK |
 | 📊 **Executive Dashboard** | [`/dashboard`](https://online-thousands-tutorial-king.trycloudflare.com/dashboard) | Omset Harian/MTD, Top 5 Part HGP, Efisiensi Mekanik, Alert Stok Menipis |
 | 📋 **Work Order & POS Cashier** | [`/work-orders`](https://online-thousands-tutorial-king.trycloudflare.com/work-orders) | Switcher **Tabel vs Kanban Pit Board**, Hotkeys POS (`F4`, `F8`, `F9`), QRIS Dinamis |
 | 📺 **TV Waiting Lounge Monitor** | [`/waiting-display`](https://online-thousands-tutorial-king.trycloudflare.com/waiting-display) | Tampilan TV Kiosk 16:9 fullscreen, auto-polling 5s status Pit 1-4 & Marquee |
@@ -336,7 +338,40 @@ Sistem notifikasi modern *non-blocking* menggantikan fungsi `alert()` bawaan bro
 
 ---
 
-## 12. Profil Pengembang & Lisensi
+## 12. Modul Bisnis Retail Otomotif & Integrasi Pembiayaan NSC Multifinance
+
+Untuk mencerminkan secara utuh model bisnis **PT Nusantara Sakti Group (NSS)** sebagai Dealer Resmi Honda, Bengkel AHASS, dan Pembiayaan Kredit Terbesar (**NSC Finance / PT Nusa Surya Ciptadana**), sistem ini mengintegrasikan proses bisnis retail modern:
+
+### A. Direct Over-The-Counter (OTC) POS Cashier (`/pos-retail`)
+- **Fast-Throughput Checkout**: Transaksi kasir langsung untuk pembelian suku cadang Honda Genuine Parts (HGP), oli standar pabrikan AHM Oil (MPX1, MPX2, SPX2), dan aksesoris resmi tanpa harus melalui tiket servis antrean mekanik.
+- **Dukungan Barcode Scanner**: Bidang pencarian otomatis siap menerima input pemindai *barcode* fisik, lengkap dengan efek suara sintetis *Scanner Beep* (880Hz Sine Wave).
+- **Promo Engine & Bundling**:
+  - Kupon diskon otomatis (*misal: `NSSHEMAT10`, `TUNEUPMATIC`, `OLIASLI5K`*).
+  - Peringatan batas minimal belanja dan kalkulasi diskon flat/persentase secara *real-time*.
+- **Quick-Cash Presets & Struk Kasir Thermal**: Tombol uang pas, tombol pecahan cepat (*50k, 100k, 200k*), perhitungan kembalian instan, dan pratinjau struk kasir thermal 58mm/80mm ESC/POS.
+
+### B. Showroom Unit Kendaraan & Alokasi Nomor Rangka Astra (`/showroom`)
+- **Katalog Fisik Motor Showroom**: Menampilkan jajaran motor Honda terbaru (*Honda Vario 160 ABS, Beat Deluxe CBS-ISS, PCX 160, Scoopy Prestige, EM1 e: Motor Listrik, CBR150R*).
+- **Pelacakan Fisik VIN & Nomor Mesin**: Setiap unit motor memiliki Nomor Rangka unik pabrikan Astra (`MH1...`) dan Nomor Mesin (`KF81E...`) untuk integritas pengurusan faktur dan STNK Samsat.
+- **Status Alokasi Unit**: Status transisi unit kendaraan dari *Ready Showroom* &rarr; *Booked SPK* &rarr; *Delivered*.
+
+### C. Kalkulator Simulasi Kredit Interaktif NSC Finance
+- **Interactive DP Slider**: Calon debitur dapat menggeser *slider* Uang Muka (10% s/d 50% sesuai regulasi OJK) dengan konversi nominal Rupiah langsung.
+- **Tenor Fleksibel**: Pilihan jangka waktu cicilan 11, 17, 23, 29, dan 35 bulan.
+- **Engine Finansial Cicilan**:
+  - Perhitungan Pokok Hutang (*Principal Loan*).
+  - Bunga pembiayaan flat 18.00% per tahun (1.5% per bulan).
+  - Estimasi cicilan per bulan, biaya fidusia/administrasi, dan asuransi kehilangan Total Loss Only (TLO).
+  - Total Pembayaran Pertama (TDP: DP + Biaya Admin + Asuransi).
+
+### D. Penerbitan Surat Pemesanan Kendaraan (SPK) Resmi NSS
+- Penerbitan nomor SPK otomatis anti-tabrakan dengan *advisory locking*: `SPK-NSS-YYYYMMDD-XXXX`.
+- Pilihan skema pembayaran: **Cash Keras** (dengan bukti Tanda Jadi / Booking Fee) atau **Kredit NSC Finance** (lengkap dengan data tenor dan angsuran bulanan).
+- Cetak lembar konfirmasi SPK resmi berstandar dealer Astra Honda.
+
+---
+
+## 13. Profil Pengembang & Lisensi
 - **Pengembang**: **Frans Alwan** ([@fransalwan](https://github.com/fransalwan))
 - **Email**: fransalwan55@gmail.com
 - **Posisi Tujuan**: **Programmer Junior** — PT Nusantara Sakti Group (NSS)

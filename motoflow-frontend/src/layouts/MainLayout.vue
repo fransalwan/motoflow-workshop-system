@@ -35,14 +35,22 @@
           <span>Servis</span>
         </router-link>
 
-        <!-- Center Raised Action Button (Buat Servis Baru) -->
+        <!-- Center Raised Action Button (Kasir Retail OTC Cepat) -->
         <router-link
-          to="/work-orders/create"
+          to="/pos-retail"
           class="flex flex-col items-center justify-center -mt-5">
           <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-red-700 to-red-500 text-white flex items-center justify-center shadow-lg shadow-red-900/30 border-4 border-white active:scale-90 transition">
-            <Plus class="w-6 h-6 stroke-[2.5]" />
+            <ShoppingBag class="w-5 h-5 stroke-[2.2]" />
           </div>
-          <span class="text-[9px] font-bold text-slate-700 mt-1">Daftar</span>
+          <span class="text-[9px] font-bold text-slate-700 mt-1">Retail POS</span>
+        </router-link>
+
+        <router-link
+          to="/showroom"
+          class="flex flex-col items-center justify-center w-14 py-1 text-[10px] font-semibold transition"
+          :class="$route.path === '/showroom' ? 'text-red-600' : 'text-slate-400'">
+          <Bike class="w-5 h-5 mb-0.5" />
+          <span>Showroom</span>
         </router-link>
 
         <router-link
@@ -51,14 +59,6 @@
           :class="$route.path === '/inventory' ? 'text-red-600' : 'text-slate-400'">
           <PackageCheck class="w-5 h-5 mb-0.5" />
           <span>HGP</span>
-        </router-link>
-
-        <router-link
-          to="/customers"
-          class="flex flex-col items-center justify-center w-14 py-1 text-[10px] font-semibold transition"
-          :class="$route.path === '/customers' ? 'text-red-600' : 'text-slate-400'">
-          <Users class="w-5 h-5 mb-0.5" />
-          <span>Motor</span>
         </router-link>
       </nav>
     </div>
@@ -76,6 +76,8 @@ import {
   Plus,
   PackageCheck,
   Users,
+  ShoppingBag,
+  Bike,
 } from 'lucide-vue-next'
 import Sidebar from '../components/Sidebar.vue'
 import Navbar from '../components/Navbar.vue'
