@@ -36,3 +36,4 @@ func TestCalculateCreditSimulation(t *testing.T) {
 		t.Errorf("Monthly installment: got %s, want 1045714", res.MonthlyInstallment.String())
 	}
 }
+

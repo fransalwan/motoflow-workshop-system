@@ -702,3 +702,4 @@ function printReceipt() {
   window.print()
 }
 </script>
+

@@ -31,7 +31,10 @@ func (ctrl *RetailController) Checkout(c *gin.Context) {
 		return
 	}
 
-	userID, exists := c.Get("user_id")
+	userID, exists := c.Get("userID")
+	if !exists {
+		userID, exists = c.Get("user_id")
+	}
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Autentikasi kasir diperlukan"})
 		return

@@ -20,3 +20,4 @@ type RetailCheckoutRequest struct {
 	Notes         string              `json:"notes"`
 	Items         []RetailItemRequest `json:"items" binding:"required,min=1"`
 }
+

@@ -91,3 +91,4 @@ func TestCalculateRetailTotals(t *testing.T) {
 		t.Errorf("Change amount mismatch: got %s, want 21190", change.String())
 	}
 }
+

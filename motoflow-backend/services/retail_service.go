@@ -87,3 +87,4 @@ func GenerateRetailInvoiceNumber(tx *gorm.DB) (string, error) {
 	invoiceNumber := fmt.Sprintf("INV-NSS-%s-%04d", datePrefix, sequence)
 	return invoiceNumber, nil
 }
+

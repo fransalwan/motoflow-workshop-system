@@ -96,3 +96,4 @@ func GenerateSPKNumber(tx *gorm.DB) (string, error) {
 	spkNumber := fmt.Sprintf("SPK-NSS-%s-%04d", datePrefix, sequence)
 	return spkNumber, nil
 }
+

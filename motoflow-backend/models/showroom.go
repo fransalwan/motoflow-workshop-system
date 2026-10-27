@@ -47,3 +47,4 @@ type SPKUnit struct {
 	UpdatedAt          time.Time       `json:"updated_at"`
 	DeletedAt          gorm.DeletedAt  `gorm:"index" json:"-"`
 }
+

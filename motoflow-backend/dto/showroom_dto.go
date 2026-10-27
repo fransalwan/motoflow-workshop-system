@@ -20,3 +20,4 @@ type CreateSPKRequest struct {
 	MonthlyInstallment decimal.Decimal `json:"monthly_installment"`
 	Notes              string          `json:"notes"`
 }
+
