@@ -180,7 +180,7 @@ defineEmits(['close'])
 function downloadPDF() {
   if (!props.workOrder) return
   const token = localStorage.getItem('motoflow_token')
-  const url = `http://localhost:8080/api/v1/work-orders/${props.workOrder.id}/invoice-pdf`
+  const url = `/api/v1/work-orders/${props.workOrder.id}/invoice-pdf`
   
   // Open with fetch & blob or direct link
   fetch(url, {

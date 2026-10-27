@@ -10,6 +10,7 @@ import (
 
 	"motoflow-backend/dto"
 	"motoflow-backend/models"
+	"motoflow-backend/services"
 )
 
 type DashboardController struct {
@@ -56,6 +57,14 @@ type DashboardSummary struct {
 }
 
 func (ctrl *DashboardController) GetSummary(c *gin.Context) {
+	cacheKey := "dashboard:summary"
+	if cached, found := services.GetCache().Get(cacheKey); found {
+		if summary, ok := cached.(DashboardSummary); ok {
+			c.JSON(http.StatusOK, dto.SuccessResponse("Ringkasan dashboard eksekutif (cached)", summary))
+			return
+		}
+	}
+
 	now := time.Now()
 	startOfDay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
@@ -196,6 +205,8 @@ func (ctrl *DashboardController) GetSummary(c *gin.Context) {
 		MechanicRankings:   mechanicRankings,
 		DailyTrend:         dailyTrend,
 	}
+
+	services.GetCache().Set(cacheKey, summary, 1*time.Minute)
 
 	c.JSON(http.StatusOK, dto.SuccessResponse("Ringkasan dashboard eksekutif", summary))
 }

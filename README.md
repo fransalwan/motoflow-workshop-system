@@ -5,10 +5,13 @@
 [![Vue 3](https://img.shields.io/badge/Vue.js-3.4%2B-4FC08D?style=for-the-badge&logo=vue.js)](https://vuejs.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql)](https://www.postgresql.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-red.svg?style=for-the-badge)](LICENSE)
+[![Docker](https://img.shields.io/badge/Docker-Multi--Stage-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com)
+[![CI/CD](https://img.shields.io/badge/GitHub_Actions-Automated_CI-2088FF?style=for-the-badge&logo=github-actions)](.github/workflows/ci.yml)
+[![Live Demo Tunnel](https://img.shields.io/badge/Live_Tunnel-Cloudflare-F38020?style=for-the-badge&logo=cloudflare)](https://online-thousands-tutorial-king.trycloudflare.com)
 
 > **Portofolio Aplikasi Web Khusus Posisi "Programmer Junior" di PT Nusantara Sakti Group (NSS)**  
-> *Dealer Resmi Honda, Bengkel AHASS, dan Perusahaan Multifinance Terbesar di Indonesia.*
+> *Dealer Resmi Honda, Bengkel AHASS, dan Perusahaan Multifinance Terbesar di Indonesia.*  
+> 🌐 **Live Public Demo**: [https://online-thousands-tutorial-king.trycloudflare.com](https://online-thousands-tutorial-king.trycloudflare.com)
 
 ---
 
@@ -199,7 +202,28 @@ Seluruh query SQL agregasi tersedia di berkas [docs/reporting-queries.sql](docs/
 
 ---
 
-## 10. Profil Pengembang & Lisensi
+## 10. Implementasi Fase 4: Production Maturity, Caching, Containerization & CI/CD
+
+Sebagai bukti kesiapan ke tingkat *production-ready enterprise*, sistem telah dilengkapi dengan arsitektur Fase 4:
+
+1. **High-Performance In-Memory & Redis Caching Layer (`services/cache_service.go`)**:
+   - Caching thread-safe dengan TTL pada ringkasan dashboard eksekutif dan katalog suku cadang fast-moving.
+   - *Cache Invalidation otomatis*: Cache metrik langsung di-reset begitu transaksi Work Order baru masuk, status diperbarui, atau kasir menyelesaikan pembayaran.
+2. **Database Migration Management Resmi (`migrations/`)**:
+   - `000001_create_initial_schema.up.sql` & `.down.sql`: DDL relasional PostgreSQL berstandar enterprise.
+   - `000002_add_indexes_and_constraints.up.sql` & `.down.sql`: Composite covering indexes untuk performa tinggi pencarian plat motor dan nomor part.
+3. **Containerization Multi-Stage Docker**:
+   - **Backend Dockerfile**: Menggunakan `golang:1.24-alpine` sebagai builder dan `alpine:3.19` minimalis non-root user sebagai runtime dengan zona waktu Asia/Jakarta.
+   - **Frontend Dockerfile**: Multi-stage build Node 20 dengan server reverse-proxy Nginx Alpine teroptimasi gzip.
+   - **Docker Compose Orkestrasi Penuh (`docker-compose.yml`)**: Menggabungkan PostgreSQL 16, Redis 7, Golang API Backend, dan Vue 3 SPA Frontend.
+4. **Automated CI/CD Pipeline (`.github/workflows/ci.yml`)**:
+   - Otomatis menjalankan `go mod verify`, `go vet ./...`, `go test -v -race ./...`, kompilasi Go binary, dan `npm run build` pada setiap *push* atau *pull request* ke branch `main`.
+5. **Live Public Tunneling Deployment**:
+   - Terintegrasi dengan secure tunneling Cloudflare sehingga dapat diakses secara publik dan aman via protokol HTTPS.
+
+---
+
+## 11. Profil Pengembang & Lisensi
 - **Pengembang**: **Frans Alwan** ([@fransalwan](https://github.com/fransalwan))
 - **Email**: fransalwan55@gmail.com
 - **Posisi Tujuan**: **Programmer Junior** — PT Nusantara Sakti Group (NSS)

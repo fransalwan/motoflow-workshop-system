@@ -208,6 +208,9 @@ func (ctrl *WorkOrderController) Create(c *gin.Context) {
 		Preload("Items.Sparepart").
 		First(&createdWO, createdWO.ID)
 
+	// Invalidate dashboard metrics cache
+	services.GetCache().InvalidatePrefix("dashboard:")
+
 	c.JSON(http.StatusCreated, dto.SuccessResponse("Work Order berhasil diterbitkan", createdWO))
 }
 
@@ -241,6 +244,7 @@ func (ctrl *WorkOrderController) UpdateStatus(c *gin.Context) {
 		return
 	}
 
+	services.GetCache().InvalidatePrefix("dashboard:")
 	ctrl.db.Preload("Customer").Preload("Mechanic").Preload("Items").First(&wo, wo.ID)
 	c.JSON(http.StatusOK, dto.SuccessResponse("Status Work Order berhasil diperbarui", wo))
 }
@@ -288,6 +292,7 @@ func (ctrl *WorkOrderController) ProcessPayment(c *gin.Context) {
 		return
 	}
 
+	services.GetCache().InvalidatePrefix("dashboard:")
 	ctrl.db.Preload("Customer").Preload("Mechanic").Preload("ServiceAdvisor").Preload("Items").First(&wo, wo.ID)
 	c.JSON(http.StatusOK, dto.SuccessResponse("Pembayaran kasir berhasil diselesaikan", wo))
 }
